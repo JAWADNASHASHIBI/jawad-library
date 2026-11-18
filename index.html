@@ -76,8 +76,11 @@ fetch("https://api.github.com/users/" + USER + "/repos?per_page=100&sort=updated
     const list = repos
       .filter(r => r.has_pages && !EXCLUDE.includes(r.name.toLowerCase()))
       .map(r => ({name:r.name, title:r.description}));
-    if (list.length) draw(list);
-    document.getElementById('status').textContent = "تتحدث القائمة تلقائياً من GitHub · عدد المشاريع: " + list.length;
+    // دمج القائمة الثابتة مع ما وجده GitHub، دون تكرار
+    const all = FALLBACK.slice();
+    list.forEach(p => { if (!all.some(x => x.name === p.name)) all.push(p); });
+    draw(all);
+    document.getElementById('status').textContent = "عدد المشاريع: " + all.length;
   })
   .catch(() => {});
 </script>
