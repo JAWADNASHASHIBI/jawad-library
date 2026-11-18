@@ -53,6 +53,8 @@ const FALLBACK = [
   {name:"diagnosis-expert-app",   title:"تشخيص أمراض الجهاز الهضمي", icon:"🩺"}
 ];
 // أيقونات اختيارية حسب اسم المستودع
+// مستودعات لا تظهر في المكتبة (المكتبة نفسها)
+const EXCLUDE = [USER + ".github.io", "jawad-library"];
 const ICONS = {"classify-living-things":"🌿","diagnosis-expert-app":"🩺"};
 
 function draw(list){
@@ -72,7 +74,7 @@ fetch("https://api.github.com/users/" + USER + "/repos?per_page=100&sort=updated
   .then(r => r.ok ? r.json() : Promise.reject())
   .then(repos => {
     const list = repos
-      .filter(r => r.has_pages && r.name.toLowerCase() !== USER + ".github.io")
+      .filter(r => r.has_pages && !EXCLUDE.includes(r.name.toLowerCase()))
       .map(r => ({name:r.name, title:r.description}));
     if (list.length) draw(list);
     document.getElementById('status').textContent = "تتحدث القائمة تلقائياً من GitHub · عدد المشاريع: " + list.length;
