@@ -22,6 +22,13 @@ a.book:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.08)}
 .book h2{font-size:1.15rem;margin:10px 0 4px}
 .book .slug{font-size:.8rem;color:var(--muted);direction:ltr;text-align:right;font-family:monospace}
 .book .open{margin-top:auto;padding-top:12px;color:var(--accent);font-weight:700;font-size:.92rem}
+.sec{margin:30px 0 12px;font-size:1.25rem;font-weight:800;display:flex;align-items:center;gap:8px}
+.sec::after{content:"";flex:1;height:1px;background:var(--line)}
+.shelf.small{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.shelf.small a.book{padding:12px 14px;border-inline-start-width:4px}
+.shelf.small .book h2{font-size:1rem;margin:4px 0 0}
+.shelf.small .book .open{display:none}
+.search{display:block;width:100%;max-width:420px;margin:0 auto 8px;font:inherit;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
 .status{text-align:center;color:var(--muted);font-size:.9rem;margin-top:14px}
 footer{margin-top:36px;text-align:center;font-size:.85rem;color:var(--muted);line-height:1.8}
 footer a{color:inherit}
@@ -34,7 +41,10 @@ footer a{color:inherit}
     <p>أنظمة خبيرة ومشاريع تعليمية في الذكاء الاصطناعي والعلوم والبرمجة</p>
   </header>
 
+  <input class="search" id="q" type="search" placeholder="ابحث في المكتبة… (مثلاً: غرفة هروب، امتحان، طباعة)">
+  <h2 class="sec">الأنظمة الخبيرة</h2>
   <div class="shelf" id="shelf"></div>
+  <div id="sections"></div>
   <div class="status" id="status"></div>
 
   <footer>
@@ -54,7 +64,7 @@ const FALLBACK = [
 ];
 // أيقونات اختيارية حسب اسم المستودع
 // مستودعات لا تظهر في المكتبة (المكتبة نفسها)
-const EXCLUDE = [USER + ".github.io", "jawad-library"];
+const EXCLUDE = [USER + ".github.io", "jawad-library", "jawadteacher"];
 const ICONS = {"classify-living-things":"🌿","diagnosis-expert-app":"🩺"};
 
 function draw(list){
@@ -68,6 +78,58 @@ function draw(list){
 }
 
 draw(FALLBACK);
+
+// ===== مشاريع موقع jawadteacher (منقولة من نيوسيتي) =====
+const OLD = SITE + "jawadteacher/";
+const SECTIONS = [
+ ["🔐 غرف الهروب", [
+  ["atom.html","أسرار الذرة","⚛️"],["enerjy.html","طاقة المستقبل والمحاكاة الحيوية","⚡"],
+  ["escape.html","سر الغواصة أوميغا","🌊"],["groub.html","مختبر التغذية - الصف التاسع","🥗"],
+  ["trangles.html","لغز معبد فيثاغورس","📐"],["exit.html","لغز معبد فيثاغورس (نسخة أولى)","📐"],
+  ["israa.html","فعالية الإسراء والمعراج","🌙"]]],
+ ["🎮 ألعاب تعليمية", [
+  ["lossword.html","الكلمة الضائعة","🔤"],["lossword1.html","الكلمة الضائعة 2","🔤"],["lossword22222222.html","الكلمة الضائعة 3","🔤"],
+  ["lossword2.html","الكلمة الضائعة - شركة سيد نظيف","🧽"],["hebrowword.html","الكلمة الضائعة - طاقة وكهرباء (عربي/عبري)","🔌"],
+  ["numberrain.html","مطر المسائل","🌧️"],["colornumber.html","لوّن حسب الرقم","🎨"],
+  ["letter.html","سحب وإفلات الحروف","🔠"],["gcolor.html","لوّن حرف ج","🖍️"],
+  ["drop%26drag.html","اسحب وأفلت","🖱️"],["touchdeag.htm","اختر الصورة التي فيها حرف أ","🐪"],
+  ["number%20fall.htm","تساقط الأعداد - القسمة","➗"],["cardsfirstclass.html","بطاقات رحلة الصف الأول","🃏"],
+  ["scratch.html","بطاقات الطاقة - مهمة القلم الطائر","✏️"],["emoji.html","المشاعر والتعاطف مع الإيموجي","😊"]]],
+ ["📝 امتحانات واختبارات", [
+  ["exam7tec.html","امتحان التكنولوجيا - الصف السابع","💻"],["exam8tec.html","امتحان التكنولوجيا - الصف الثامن","💻"],
+  ["math8exam.html","امتحان الرياضيات - الصف الثامن","🔢"],["exam.html","قواعد اللغة العربية - الصف الرابع","📖"],
+  ["examarabic.html","امتحان اللغة العربية","📖"],["questions.html","اختبار مكونات الحاسوب","🖥️"]]],
+ ["⌨️ الطباعة والحساب", [
+  ["ttyping.html","الحساب السريع وسرعة الطباعة","⌨️"],["ttyping1.html","مدرب الطباعة الكلاسيكي 1992","🕹️"],
+  ["letter1.html","مدرب الطباعة مع لوحة مفاتيح إرشادية","⌨️"],["multiply.html","عمليات الضرب","✖️"],
+  ["default.html","العمليات الحسابية الأربع","➕"]]],
+ ["🔧 التكنولوجيا والمايكروبت", [
+  ["ac.html","أساسيات الكهرباء والإلكترونيات - الصف التاسع","🔋"],["microbit.html","نظام التحليل الذكي للمايكروبت","📟"],
+  ["micro-bit.html","نظام التحليل الذكي - نسخة المدارس","📟"],["mic.html","نظام التحليل الذكي - نسخة 2","📟"],
+  ["smartfocus1.html","شاشة EnergyFocus الذكية","📺"],["focus.html","بوستر مشروع Energy Changers","🪧"],
+  ["smartfocus.html","بوستر المعرض المدرسي Smart Focus","🪧"],["smartfocusapp.html","Smart Focus - تطبيق","🪧"],
+  ["smart_focus.html","Smart Focus - نسخة","🪧"],["SmartFocus.htm","Smart Focus - نسخة أولى","🪧"]]],
+ ["🧰 أدوات للمعلم", [
+  ["quran.html","مولّد شهادات القرآن الكريم","📜"],["finance.html","حاسبة القرض والفائدة","🧮"]]],
+ ["🗄️ الأرشيف القديم", [
+  ["index.html","صفحتي القديمة على نيوسيتي","🏠"],["g/index.htm","تطوير طرق التفكير باستخدام الحاسوب","💡"],
+  ["genially_63e7f73f7b2abe001960489c/genially.html","غرف الهروب (جينيالي)","🗝️"],["I.HTM","تمرين لمراعاة الفروق الفردية","📄"]]]
+];
+document.getElementById('sections').innerHTML = SECTIONS.map(([title, items]) =>
+  `<h2 class="sec">${title}</h2><div class="shelf small">` + items.map(([f,t,i]) =>
+    `<a class="book" href="${OLD}${f}"><div class="icon">${i}</div><h2>${t}</h2></a>`).join('') + `</div>`).join('');
+
+// البحث
+document.getElementById('q').addEventListener('input', e => {
+  const v = e.target.value.trim();
+  document.querySelectorAll('a.book').forEach(a => a.style.display = !v || a.textContent.includes(v) ? '' : 'none');
+  document.querySelectorAll('.sec').forEach(h => {
+    const shelf = h.nextElementSibling;
+    const any = shelf && [...shelf.querySelectorAll('a.book')].some(a => a.style.display !== 'none');
+    h.style.display = shelf && !any ? 'none' : '';
+  });
+});
+
 
 // تحديث تلقائي: يجلب كل المستودعات المنشورة على GitHub Pages
 fetch("https://api.github.com/users/" + USER + "/repos?per_page=100&sort=updated")
