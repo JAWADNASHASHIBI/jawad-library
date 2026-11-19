@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>غرفة هروب: بيت أويلر</title>
+<style>
+  :root{
+    --bg:#0f172a; --card:#111c33; --line:#26324d; --ink:#e8eefc; --muted:#9fb0d0;
+    --accent:#f5b83d; --good:#34d399; --bad:#f87171; --edge:#5b8def;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:radial-gradient(circle at 20% 0%,#1c2a4d,var(--bg) 60%);color:var(--ink);min-height:100vh;line-height:1.7}
+  .wrap{max-width:1100px;margin:0 auto;padding:20px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+  h1{margin:0;font-size:1.6rem}
+  h1 span{color:var(--accent)}
+  .locks{display:flex;gap:8px}
+  .lock{width:42px;height:42px;border-radius:10px;border:2px solid var(--line);display:grid;place-items:center;font-size:1.2rem;background:var(--card);transition:.3s}
+  .lock.open{border-color:var(--good);background:rgba(52,211,153,.12)}
+  .lock.now{border-color:var(--accent)}
+  .grid{display:grid;grid-template-columns:minmax(280px,380px) 1fr;gap:20px;align-items:start}
+  @media (max-width:820px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+  .board svg{width:100%;height:auto;display:block}
+  .board .cap{color:var(--muted);font-size:.9rem;text-align:center;margin-top:6px}
+  h2{margin:0 0 6px;font-size:1.3rem}
+  .tag{display:inline-block;background:rgba(245,184,61,.15);color:var(--accent);border-radius:999px;padding:2px 12px;font-size:.85rem;margin-bottom:8px}
+  .ltr{direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:Consolas,monospace}
+  table{border-collapse:collapse;margin:10px 0;width:100%;font-size:.95rem}
+  td,th{border:1px solid var(--line);padding:6px 8px;text-align:center}
+  th{background:#17233f;color:var(--muted);font-weight:600}
+  .answer{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+  input[type=text]{flex:1;min-width:140px;font-size:1.3rem;padding:10px 14px;border-radius:10px;border:2px solid var(--line);background:#0b1426;color:var(--ink);text-align:center;letter-spacing:4px}
+  input[type=text]:focus{outline:none;border-color:var(--accent)}
+  button{font:inherit;font-size:1rem;padding:10px 18px;border-radius:10px;border:0;cursor:pointer;background:var(--accent);color:#1b1300;font-weight:700}
+  button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:500}
+  button:disabled{opacity:.4;cursor:not-allowed}
+  .msg{margin-top:12px;padding:10px 14px;border-radius:10px;display:none}
+  .msg.show{display:block}
+  .msg.bad{background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.4)}
+  .msg.good{background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4)}
+  .msg.info{background:rgba(91,141,239,.12);border:1px solid rgba(91,141,239,.4)}
+  .shake{animation:shake .4s}
+  @keyframes shake{25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-4px)}}
+  .lockline{margin-top:14px;padding:12px 14px;border-radius:12px;background:#0b1426;border:1px dashed var(--accent)}
+  .path{font-family:Consolas,monospace;direction:ltr;text-align:left;font-size:1.15rem;min-height:1.7em;letter-spacing:1px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .hidden{display:none!important}
+  .center{text-align:center}
+  .big{font-size:3rem;margin:0}
+  .muted{color:var(--muted)}
+  svg .vtx{cursor:default}
+  svg.play .vtx{cursor:pointer}
+  svg.play .vtx:hover circle.dot{r:9}
+  footer{color:var(--muted);font-size:.8rem;text-align:center;margin-top:24px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🏠 غرفة هروب: <span>بيت أويلر</span></h1>
+    <div class="locks" id="locks"></div>
+  </header>
+
+  <div class="grid">
+    <div class="card board">
+      <svg id="house" viewBox="0 0 370 450" role="img" aria-label="بيت أويلر على محاور الإحداثيات"></svg>
+      <div class="cap" id="cap">كل مربع = وحدة واحدة</div>
+    </div>
+
+    <div class="card" id="panel"></div>
+  </div>
+  <footer>الميل · المعادلات الخطية · فيثاغورس · مسار أويلر — الصف الثامن والتاسع</footer>
+</div>
+
+<script>
+// البيانات
+const P = {A:[0,0], B:[6,0], C:[6,8], D:[0,8], E:[3,12]};
+const EDGES = [["A","B"],["B","C"],["C","D"],["D","A"],["A","C"],["B","D"],["D","E"],["C","E"]];
+const U = 30, px = x => 70 + x*U, py = y => 410 - y*U;
+const ek = (a,b) => [a,b].sort().join("");
+const hash = s => { let x = 7; for (const c of s) x = (x*31 + c.charCodeAt(0)) % 1000003; return x; };
+const digits = s => (s || "").replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/\D/g, "");
+
+const STATIONS = [
+  {
+    tag:"المحطة 1", title:"الميل",
+    body:`<p>احسب ميل كل حافة بالقانون:
+      <span class="ltr">m = (y₂ − y₁) ÷ (x₂ − x₁)</span></p>
+      <table><tr><th>الحافة</th><th>AB</th><th>BC</th><th>CD</th><th>DA</th></tr>
+      <tr><th>الميل</th><td>؟</td><td>؟</td><td>؟</td><td>؟</td></tr>
+      <tr><th>الحافة</th><th>AC</th><th>BD</th><th>DE</th><th>CE</th></tr>
+      <tr><th>الميل</th><td>؟</td><td>؟</td><td>؟</td><td>؟</td></tr></table>
+      <p class="muted">فكّر: أي حافتين توازيان AC؟ وهل توجد حواف لا يمكن حساب ميلها؟</p>`,
+    lock:`اكتب ميل الحافة <b>DE</b> على شكل كسر مختزل <span class="ltr">a/b</span>. الرمز هو البسط ثم المقام.`,
+    code:8390,
+    hints:["انتبه للترتيب: الفرق في y يُقسم على الفرق في x.",
+           "من D(0,8) إلى E(3,12): كم ارتفعنا؟ وكم تقدّمنا إلى اليمين؟"]
+  },
+  {
+    tag:"المحطة 2", title:"معادلة المستقيم",
+    body:`<p>معادلة المستقيم: <span class="ltr">y = mx + b</span> حيث m الميل و b نقطة التقاطع مع محور y.</p>
+      <ol><li>اكتب معادلة المستقيم <b>BD</b>.</li>
+      <li>اكتب معادلة المستقيم <b>CE</b>. (عوّض النقطة C لتجد b)</li></ol>`,
+    lock:`ما قيمة <b>b</b> في معادلة المستقيم CE؟`,
+    code:8300,
+    hints:["ميل CE يساوي ميل BD، لأنهما متوازيان.",
+           "عوّض x = 6 و y = 8 في المعادلة y = (−4/3)x + b ثم احسب b."]
+  },
+  {
+    tag:"المحطة 3", title:"أين يلتقي القطران؟",
+    body:`<ol><li>تحقق أن معادلة القطر AC هي <span class="ltr">y = (4/3)x</span></li>
+      <li>استعمل معادلة BD من المحطة 2، وحلّ جهاز المعادلتين لتجد نقطة تقاطع القطرين.</li></ol>`,
+    lock:`اكتب الإحداثي x ثم الإحداثي y لنقطة التقاطع كعدد واحد.`,
+    code:8360,
+    hints:["ضع المعادلتين متساويتين: (4/3)x = (−4/3)x + 8",
+           "بعد أن تجد x، عوّضه في y = (4/3)x لتجد y."]
+  },
+  {
+    tag:"المحطة 4", title:"فيثاغورس",
+    body:`<p>الحواف المائلة ليست أفقية ولا عمودية، فنحسب طولها بنظرية فيثاغورس:
+      ارسم مثلثًا قائمًا تحت كل حافة مائلة. <span class="ltr">a² + b² = c²</span></p>
+      <table><tr><th>الحافة</th><th>الضلع الأفقي</th><th>الضلع العمودي</th><th>الطول</th></tr>
+      <tr><td>AC</td><td>؟</td><td>؟</td><td>؟</td></tr>
+      <tr><td>BD</td><td>؟</td><td>؟</td><td>؟</td></tr>
+      <tr><td>DE</td><td>؟</td><td>؟</td><td>؟</td></tr>
+      <tr><td>CE</td><td>؟</td><td>؟</td><td>؟</td></tr></table>`,
+    lock:`ما مجموع أطوال الحواف المائلة الأربع؟`,
+    code:8356,
+    hints:["في AC: الضلع الأفقي 6 والعمودي 8. هل تذكر المثلث 3، 4، 5؟",
+           "6² + 8² = 100، إذن AC = 10. والآن احسب DE: الضلعان 3 و 4."]
+  },
+  {
+    tag:"المحطة 5", title:"مسار أويلر — القفل الأخير", euler:true,
+    body:`<p><b>درجة الرأس</b> = عدد الحواف التي تخرج منه.
+      <b>القاعدة:</b> يمكن المرور على كل الحواف مرة واحدة إذا كان عدد الرؤوس ذات الدرجة الفردية 0 أو 2،
+      وإذا كانا رأسين فالمسار يبدأ من أحدهما وينتهي عند الآخر.</p>
+      <p>🖱️ <b>اضغط على الرؤوس في الرسم</b> لترسم مسارًا يمر على الحواف الثماني، كل حافة مرة واحدة فقط.</p>
+      <div class="lockline"><div class="muted">مسارك:</div><div class="path" id="pathText">—</div>
+      <div class="row"><button class="ghost" id="undo">↶ تراجع</button><button class="ghost" id="reset">⟲ من جديد</button></div>
+      <div class="msg" id="eMsg"></div></div>`,
+    lock:`بعد أن تكمل المسار: ما الطول الكلي لمسارك؟ (مجموع أطوال كل الحواف التي مررت بها)`,
+    code:8426,
+    hints:["الحواف الأفقية والعمودية سهلة: AB = 6، BC = 8، CD = 6، DA = 8.",
+           "مسارك يمر على كل الحواف الثماني، فاجمع الأطوال الأربعة السهلة مع رمز المحطة 4."]
+  }
+];
+
+// الحالة
+const KEY = "euler-house-v1";
+let S = {step:-1, tries:[0,0,0,0,0], start:null, end:null, path:[], name:""};
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s) S = Object.assign(S, s); } catch(e){}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
+
+// الرسم
+const svg = document.getElementById("house");
+function draw(){
+  const play = S.step === 4 && !eulerDone();
+  svg.classList.toggle("play", play);
+  const used = new Set();
+  for (let i = 1; i < S.path.length; i++) used.add(ek(S.path[i-1], S.path[i]));
+  let g = "";
+  for (let x = 0; x <= 8; x++) g += `<line x1="${px(x)}" y1="${py(13)}" x2="${px(x)}" y2="${py(0)}" stroke="#22304f"/>`;
+  for (let y = 0; y <= 13; y++) g += `<line x1="${px(0)}" y1="${py(y)}" x2="${px(8)}" y2="${py(y)}" stroke="#22304f"/>`;
+  for (let x = 1; x <= 8; x++) g += `<text x="${px(x)}" y="${py(0)+16}" fill="#6f80a3" font-size="10" text-anchor="middle">${x}</text>`;
+  for (let y = 1; y <= 13; y++) g += `<text x="${px(0)-8}" y="${py(y)+4}" fill="#6f80a3" font-size="10" text-anchor="end">${y}</text>`;
+  g += `<line x1="${px(0)}" y1="${py(0)}" x2="${px(8)+10}" y2="${py(0)}" stroke="#9fb0d0" stroke-width="1.5"/>`;
+  g += `<line x1="${px(0)}" y1="${py(0)}" x2="${px(0)}" y2="${py(13)-10}" stroke="#9fb0d0" stroke-width="1.5"/>`;
+  g += `<text x="${px(8)+16}" y="${py(0)+4}" fill="#9fb0d0" font-size="13">x</text>`;
+  g += `<text x="${px(0)}" y="${py(13)-14}" fill="#9fb0d0" font-size="13" text-anchor="middle">y</text>`;
+  for (const [a,b] of EDGES){
+    const on = used.has(ek(a,b));
+    g += `<line x1="${px(P[a][0])}" y1="${py(P[a][1])}" x2="${px(P[b][0])}" y2="${py(P[b][1])}"
+      stroke="${on ? "#34d399" : "#5b8def"}" stroke-width="${on ? 5 : 3}" stroke-linecap="round"/>`;
+  }
+  const last = S.path[S.path.length-1];
+  const lbl = {A:[-8,20,"end"], B:[8,20,"start"], C:[12,-8,"start"], D:[-12,-8,"end"], E:[0,-16,"middle"]};
+  for (const v in P){
+    const [x,y] = P[v], [dx,dy,an] = lbl[v];
+    g += `<g class="vtx" data-v="${v}"><circle cx="${px(x)}" cy="${py(y)}" r="16" fill="transparent"/>
+      <circle class="dot" cx="${px(x)}" cy="${py(y)}" r="7" fill="${v === last ? "#f5b83d" : "#e8eefc"}"/>
+      <text x="${px(x)+dx}" y="${py(y)+dy}" fill="#e8eefc" font-size="14" font-weight="700" text-anchor="${an}" direction="ltr">${v}(${x},${y})</text></g>`;
+  }
+  svg.innerHTML = g;
+  svg.querySelectorAll(".vtx").forEach(n => n.addEventListener("click", () => clickV(n.dataset.v)));
+}
+
+// مسار أويلر
+const usedEdges = () => { const u = new Set(); for (let i = 1; i < S.path.length; i++) u.add(ek(S.path[i-1], S.path[i])); return u; };
+const eulerDone = () => usedEdges().size === EDGES.length;
+function eMsg(t, cls){ const m = document.getElementById("eMsg"); if (!m) return; m.className = "msg show " + cls; m.innerHTML = t; }
+function clickV(v){
+  if (S.step !== 4 || eulerDone()) return;
+  if (!S.path.length){ S.path.push(v); }
+  else {
+    const last = S.path[S.path.length-1], k = ek(last, v), u = usedEdges();
+    const exists = EDGES.some(([a,b]) => ek(a,b) === k);
+    if (!exists){ eMsg(`لا توجد حافة بين <b>${last}</b> و <b>${v}</b>.`, "bad"); return; }
+    if (u.has(k)){ eMsg(`الحافة <b>${last}${v}</b> مررت بها من قبل! لا يجوز المرور عليها مرتين.`, "bad"); return; }
+    S.path.push(v);
+  }
+  save(); afterMove();
+}
+function afterMove(){
+  draw();
+  const t = document.getElementById("pathText"); if (t) t.textContent = S.path.length ? S.path.join(" → ") : "—";
+  if (!S.path.length) return;
+  const u = usedEdges(), last = S.path[S.path.length-1];
+  if (eulerDone()){
+    eMsg(`🎉 ممتاز! مررت على الحواف الثماني كلها. بدأت من <b>${S.path[0]}</b> وانتهيت عند <b>${last}</b>. لماذا هذان الرأسان بالذات؟ (عدّ درجاتهما!) <br>الآن احسب طول المسار وافتح القفل الأخير.`, "good");
+    const inp = document.getElementById("code"); if (inp){ inp.disabled = false; inp.placeholder = "الرمز"; document.getElementById("check").disabled = false; inp.focus(); }
+    return;
+  }
+  const stuck = !EDGES.some(([a,b]) => (a === last || b === last) && !u.has(ek(a,b)));
+  if (stuck) eMsg(`علقت عند <b>${last}</b>! بقي ${EDGES.length - u.size} حواف لم تمر بها. اضغط «من جديد» وفكّر: من أي رأس يجب أن تبدأ؟`, "info");
+  else eMsg(`مررت على ${u.size} من 8 حواف.`, "info");
+}
+
+// الواجهة
+const panel = document.getElementById("panel");
+function renderLocks(){
+  const box = document.getElementById("locks"); box.innerHTML = "";
+  for (let i = 0; i < 5; i++){
+    const d = document.createElement("div");
+    d.className = "lock" + (i < S.step || S.end ? " open" : i === S.step ? " now" : "");
+    d.textContent = (i < S.step || S.end) ? "🔓" : "🔒";
+    box.appendChild(d);
+  }
+}
+function render(){
+  renderLocks(); draw();
+  if (S.end) return renderEnd();
+  if (S.step < 0) return renderIntro();
+  const st = STATIONS[S.step];
+  panel.innerHTML = `<div class="tag">${st.tag} من 5</div><h2>${st.title}</h2>${st.body}
+    <div class="lockline">🔒 <b>القفل:</b> ${st.lock}
+      <div class="answer"><input type="text" id="code" autocomplete="off" placeholder="الرمز">
+      <button id="check">افتح</button></div></div>
+    <div class="msg" id="msg"></div>`;
+  const inp = document.getElementById("code"), btn = document.getElementById("check");
+  btn.onclick = check; inp.onkeydown = e => { if (e.key === "Enter") check(); };
+  if (st.euler){
+    document.getElementById("undo").onclick = () => { S.path.pop(); save(); afterMove(); if (!S.path.length) document.getElementById("eMsg").className = "msg"; };
+    document.getElementById("reset").onclick = () => { S.path = []; save(); afterMove(); document.getElementById("eMsg").className = "msg"; };
+    if (!eulerDone()){ inp.disabled = true; btn.disabled = true; inp.placeholder = "أكمل المسار أولًا"; }
+    afterMove();
+  } else inp.focus();
+}
+function check(){
+  const st = STATIONS[S.step], inp = document.getElementById("code"), msg = document.getElementById("msg");
+  const v = digits(inp.value);
+  if (!v) return;
+  if (hash(v) === st.code){
+    S.step++; save();
+    if (S.step === 5){ S.end = Date.now(); save(); }
+    msg.className = "msg show good"; msg.textContent = "🔓 صحيح! انفتح القفل.";
+    setTimeout(render, 700);
+  } else {
+    S.tries[S.step]++; save();
+    const n = S.tries[S.step], h = st.hints[Math.min(n, st.hints.length) - 1];
+    msg.className = "msg show bad"; msg.innerHTML = `❌ الرمز غير صحيح (محاولة ${n}).<br>💡 <b>تلميح:</b> ${h}`;
+    inp.classList.remove("shake"); void inp.offsetWidth; inp.classList.add("shake"); inp.select();
+  }
+}
+function renderIntro(){
+  panel.innerHTML = `<div class="tag">القصة</div><h2>محبوسون في بيت أويلر!</h2>
+    <p>دخلتم بيتًا غريبًا مرسومًا على محاور الإحداثيات، وأُغلق الباب خلفكم.
+    على باب الخروج <b>خمسة أقفال</b>، وكل قفل يُفتح برمز رقمي.</p>
+    <p>حلّوا ألغاز المحطات لتجمعوا الرموز. وفي النهاية، لن يُفتح الباب إلا إذا
+    <b>مررتم على كل جدار في البيت مرة واحدة فقط</b>.</p>
+    <p class="muted">جهّزوا ورقة مربعات وقلمًا. الرموز أرقام فقط.</p>
+    <div class="answer"><input type="text" id="nm" placeholder="اسمك أو أسماء المجموعة" style="letter-spacing:0;font-size:1.1rem">
+    <button id="go">ابدأ ▶</button></div>`;
+  document.getElementById("nm").value = S.name || "";
+  document.getElementById("go").onclick = () => {
+    S.name = document.getElementById("nm").value.trim(); S.step = 0; S.start = Date.now(); save(); render();
+  };
+}
+function renderEnd(){
+  const sec = Math.round((S.end - S.start) / 1000), m = Math.floor(sec/60), s = sec % 60;
+  const tries = S.tries.reduce((a,b) => a+b, 0);
+  panel.innerHTML = `<div class="center"><p class="big">🎉🚪</p><h2>هربتم من البيت!</h2>
+    ${S.name ? `<p><b>${S.name.replace(/[<>&]/g, "")}</b></p>` : ""}
+    <p>الوقت: <b>${m} دقيقة و ${s} ثانية</b> · المحاولات الخاطئة: <b>${tries}</b></p>
+    <p class="path" style="text-align:center">${S.path.join(" → ")}</p>
+    <p class="muted">أرِ هذه الشاشة للمعلمة.</p>
+    <div class="lockline" style="text-align:right"><b>سؤال تحدٍّ:</b> لو أضفنا حافة ثانية بين A و B،
+    هل يبقى المسار ممكنًا؟ ومن أين يبدأ؟</div>
+    <div class="row" style="justify-content:center"><button class="ghost" id="again">العب من جديد</button></div></div>`;
+  document.getElementById("again").onclick = () => {
+    if (!confirm("مسح التقدم والبدء من جديد؟")) return;
+    S = {step:-1, tries:[0,0,0,0,0], start:null, end:null, path:[], name:""}; save(); render();
+  };
+}
+render();
+</script>
+</body>
+</html>
