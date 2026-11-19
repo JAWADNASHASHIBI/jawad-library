@@ -77,7 +77,7 @@ const FALLBACK = [
 ];
 // أيقونات اختيارية حسب اسم المستودع
 // مستودعات لا تظهر في المكتبة (المكتبة نفسها)
-const EXCLUDE = [USER + ".github.io", "jawad-library", "jawadteacher"];
+const EXCLUDE = [USER + ".github.io", "jawad-library", "jawadteacher", "escape-linear"];
 const ICONS = {"classify-living-things":"🌿","diagnosis-expert-app":"🩺"};
 
 function draw(list){
@@ -99,7 +99,8 @@ const SECTIONS = [
   ["atom.html","أسرار الذرة","⚛️"],["enerjy.html","طاقة المستقبل والمحاكاة الحيوية","⚡"],
   ["escape.html","سر الغواصة أوميغا","🌊"],["groub.html","مختبر التغذية - الصف التاسع","🥗"],
   ["trangles.html","لغز معبد فيثاغورس","📐"],["exit.html","لغز معبد فيثاغورس (نسخة أولى)","📐"],
-  ["israa.html","فعالية الإسراء والمعراج","🌙"]]],
+  ["israa.html","فعالية الإسراء والمعراج","🌙"],
+  ["https://jawadnashashibi.github.io/escape-linear/","غرفة هروب المستقيمات - الصف التاسع","📐"]]],
  ["🎮 ألعاب تعليمية", [
   ["lossword.html","الكلمة الضائعة","🔤"],["lossword1.html","الكلمة الضائعة 2","🔤"],["lossword22222222.html","الكلمة الضائعة 3","🔤"],
   ["lossword2.html","الكلمة الضائعة - شركة سيد نظيف","🧽"],["hebrowword.html","الكلمة الضائعة - طاقة وكهرباء (عربي/عبري)","🔌"],
@@ -130,7 +131,7 @@ const SECTIONS = [
 ];
 document.getElementById('sections').innerHTML = SECTIONS.map(([title, items]) =>
   `<h2 class="sec">${title}</h2><div class="shelf small">` + items.map(([f,t,i]) =>
-    `<a class="book" href="${OLD}${f}"><div class="icon">${i}</div><h2>${t}</h2></a>`).join('') + `</div>`).join('');
+    `<a class="book" href="${/^https?:/.test(f) ? f : OLD + f}"><div class="icon">${i}</div><h2>${t}</h2></a>`).join('') + `</div>`).join('');
 
 // البحث
 document.getElementById('q').addEventListener('input', e => {
