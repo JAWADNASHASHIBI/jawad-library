@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="copyright" content="(c) Jawad Nashashibi - CC BY-NC 4.0 - not for sale">
+<title>نظام خبير في الاحتواء</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f1efe9; --card:#fffefa; --ink:#1f2622; --muted:#5f6862; --line:#dad6cb;
+  --teal:#23685f; --teal-soft:#dcece8; --amber:#a8681a; --amber-soft:#f6e8d1;
+  --red:#a33a2c; --red-soft:#f6e0db; --plum:#6a4a86; --plum-soft:#ece4f3; --mono:'IBM Plex Mono',monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#131715;--card:#1b211e;--ink:#e7ece8;--muted:#9ba69f;--line:#313b36;
+  --teal:#72c2b5;--teal-soft:#1b302c;--amber:#e3a656;--amber-soft:#382c1b;--red:#e98172;--red-soft:#3b2420;--plum:#bf9de0;--plum-soft:#2c2335;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Tajawal',system-ui,sans-serif;font-size:17px;line-height:1.65}
+.wrap{max-width:700px;margin:0 auto;padding:20px 16px 48px}
+.back{color:var(--teal);text-decoration:none;font-weight:700;font-size:.92rem}
+header h1{font-size:1.45rem;margin:8px 0 2px;font-weight:800}
+header p{margin:0;color:var(--muted);font-size:.95rem}
+.badge{display:inline-block;font-family:var(--mono);font-size:.72rem;color:var(--teal);border:1px solid var(--teal);border-radius:4px;padding:1px 7px;letter-spacing:.04em;margin-top:10px}
+.disclaimer{margin-top:12px;background:var(--amber-soft);border-radius:10px;padding:10px 14px;font-size:.9rem}
+.disclaimer b{color:var(--amber)}
+nav{display:flex;gap:6px;margin:16px 0 14px;border-bottom:1px solid var(--line)}
+nav button{flex:1;background:none;border:none;border-bottom:3px solid transparent;padding:10px 4px;font:inherit;font-weight:700;color:var(--muted);cursor:pointer}
+nav button.on{color:var(--ink);border-bottom-color:var(--teal)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.hidden{display:none}
+.progress{display:flex;justify-content:space-between;align-items:center;font-size:.88rem;color:var(--muted);margin-bottom:6px;gap:8px}
+.bar{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;background:var(--teal);transition:width .25s}
+.q{font-size:1.25rem;font-weight:700;margin:4px 0 16px}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:start;border-radius:10px;padding:12px 14px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;font-weight:500}
+.opt:hover{border-color:var(--teal);background:var(--teal-soft)}
+.opt b{display:block;font-weight:700}
+.opt small{color:var(--muted);font-size:.86rem}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.link{font:inherit;background:none;border:1px solid var(--line);border-radius:8px;padding:6px 12px;color:var(--muted);cursor:pointer;font-size:.9rem}
+.link:hover{color:var(--ink);border-color:var(--muted)}
+.why{margin-top:12px;background:var(--plum-soft);border-radius:10px;padding:10px 14px;font-size:.92rem}
+.why b{color:var(--plum)}
+.why ul{margin:6px 0 0;padding-inline-start:20px}
+.alert{background:var(--red-soft);border-inline-start:5px solid var(--red);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.alert h3{margin:0 0 6px;color:var(--red);font-size:1.1rem}
+.stage{margin:18px 0 0}
+.stage h3{font-size:1.08rem;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.stage h3 .n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--teal);color:#fff;font-size:.85rem}
+@media (prefers-color-scheme:dark){.stage h3 .n{color:#10201d}}
+.tip{border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:8px}
+.tip .src{font-family:var(--mono);font-size:.7rem;color:var(--muted);direction:ltr;float:left;margin-top:3px}
+.tip h4{margin:0 0 4px;font-size:1rem;color:var(--teal)}
+.tip ul{margin:0;padding-inline-start:20px}
+.tip li{margin:2px 0}
+.say{display:block;background:var(--teal-soft);border-radius:6px;padding:2px 8px;margin:4px 0;font-weight:500}
+.avoid{background:var(--red-soft);border-radius:10px;padding:10px 14px}
+.avoid ul{margin:0;padding-inline-start:20px}
+.facts{margin:6px 0;padding-inline-start:20px}
+details{margin-top:18px;border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+summary{cursor:pointer;font-weight:700}
+.trace{font-size:.9rem;margin:10px 0 0;padding:0;list-style:none;counter-reset:t}
+.trace li{counter-increment:t;padding:6px 0;border-bottom:1px dashed var(--line)}
+.trace li::before{content:"دورة " attr(data-c) " · ";font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.chip{display:inline-block;background:var(--teal-soft);color:var(--teal);border-radius:999px;padding:0 9px;font-size:.84rem;margin:2px 2px;font-weight:700}
+.chip.d{background:var(--plum-soft);color:var(--plum)}
+.rule{border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:8px;font-size:.93rem}
+.rule .id{font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.kw{font-weight:800;color:var(--amber)}
+.how h3{font-size:1.08rem;margin:18px 0 6px}
+.how h3:first-child{margin-top:0}
+table.compare{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:6px}
+.compare th,.compare td{border:1px solid var(--line);padding:6px 8px;text-align:start;vertical-align:top}
+.compare th{background:var(--teal-soft)}
+.primary{font:inherit;font-weight:700;background:var(--teal);color:#fff;border:none;border-radius:10px;padding:11px 18px;cursor:pointer}
+@media (prefers-color-scheme:dark){.primary{color:#10201d}}
+footer.lic{margin-top:30px;text-align:center;font-size:.83rem;color:var(--muted);line-height:1.8}
+footer.lic a{color:inherit}
+@media print{nav,.row,.back,.disclaimer{display:none}.card{border:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../">→ العودة إلى المكتبة</a>
+  <header>
+    <span class="badge">EXPERT SYSTEM · FORWARD CHAINING</span>
+    <h1>نظام خبير في الاحتواء العاطفي والتربوي</h1>
+    <p>صف الموقف الذي أمامك، وسيستنتج النظام خطة احتواء خطوة بخطوة، ويشرح لك كيف وصل إليها.</p>
+    <div class="disclaimer"><b>تنبيه:</b> هذا نظام تعليمي يساعد المعلم وولي الأمر على التفكير في الموقف، ولا يغني عن المرشد التربوي أو الأخصائي النفسي.</div>
+  </header>
+
+  <nav>
+    <button data-tab="play" class="on">الاستشارة</button>
+    <button data-tab="kb">قاعدة المعرفة</button>
+    <button data-tab="how">كيف يعمل؟</button>
+  </nav>
+
+  <section id="play" class="card"></section>
+  <section id="kb" class="card hidden"></section>
+  <section id="how" class="card hidden how">
+    <h3>ما هو الاحتواء؟</h3>
+    <p>الاحتواء أن تستقبل مشاعر الآخر دون أن ترفضها أو تنجرف معها: تهدّئه أولاً، ثم تفهمه، ثم تساعده على التصرّف. الشعور دائماً مقبول، أما السلوك فله حدود.</p>
+    <h3>التسلسل الأمامي (Forward chaining)</h3>
+    <p>يجمع النظام <b>الحقائق</b> من إجاباتك ويضعها في <b>الذاكرة العاملة</b>، ثم يمرّ على القواعد في دورات:</p>
+    <ul class="facts">
+      <li>كل قاعدة تحققت شروطها <b>تنطلق</b>، فتضيف حقيقة جديدة أو توصية.</li>
+      <li>الحقيقة الجديدة قد تحقق شروط قاعدة أخرى في الدورة التالية، مثل: «نوبة شديدة» + «أمام الآخرين» ← «انقل الموقف».</li>
+      <li>يتوقف النظام عندما تمر دورة كاملة دون أن تنطلق أي قاعدة جديدة.</li>
+    </ul>
+    <p>بعد ذلك يرتّب التوصيات في مراحل: <b>الأمان</b>، ثم <b>التهدئة</b>، ثم <b>الحوار</b>، ثم <b>المتابعة</b>. افتح «كيف وصل النظام إلى هذه الخطة؟» أسفل النتيجة لترى القواعد التي انطلقت في كل دورة.</p>
+    <h3>ميزتا التفسير: «لماذا؟» و«كيف؟»</h3>
+    <ul class="facts">
+      <li><b>لماذا؟</b> أثناء الأسئلة: يخبرك النظام بالقواعد التي تحتاج هذا السؤال.</li>
+      <li><b>كيف؟</b> بعد النتيجة: يعرض سلسلة الاستنتاج، وكل توصية تحمل رقم القاعدة التي أنتجتها.</li>
+    </ul>
+    <h3>مقارنة مع أنظمة المكتبة الأخرى</h3>
+    <table class="compare">
+      <tr><th></th><th>نظام الاحتواء</th><th>تشخيص الجهاز الهضمي</th></tr>
+      <tr><td>طريقة الاستدلال</td><td>تسلسل أمامي: من الحقائق إلى النتائج</td><td>تسلسل خلفي: من الفرضية إلى شروطها</td></tr>
+      <tr><td>النتيجة</td><td>خطة من عدة توصيات مجتمعة</td><td>فرضية أو أكثر تثبت</td></tr>
+      <tr><td>حقائق وسيطة</td><td>نعم (مثل «فيضان انفعالي»)</td><td>لا</td></tr>
+      <tr><td>أنظمة مشابهة</td><td>CLIPS، OPS5، XCON</td><td>MYCIN، Prolog</td></tr>
+    </table>
+    <h3>أفكار للنقاش مع الطلاب</h3>
+    <ul class="facts">
+      <li>لماذا تأتي قاعدة الأمان قبل كل شيء؟</li>
+      <li>لماذا لا يقترح النظام الحوار أثناء النوبة الشديدة؟</li>
+      <li>المعلم يرى تعابير الوجه ونبرة الصوت. ما الذي لا يستطيع النظام معرفته؟</li>
+      <li>قابل مرشداً تربوياً واكتب قاعدة جديدة لشعور لم يُذكر، مثل الغيرة أو الخجل.</li>
+    </ul>
+  </section>
+
+  <footer class="lic">
+    © 2026 جواد النشاشيبي · للاستخدام التعليمي المجاني · <b>يُمنع البيع أو الاستخدام التجاري</b><br>
+    مرخّص بموجب <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.ar">المشاع الإبداعي: نسب المصنَّف، غير تجاري 4.0 (CC BY-NC 4.0)</a>
+  </footer>
+</div>
+
+<script>
+// ===== الأسئلة =====
+// ask: شرط اختياري لطرح السؤال بناءً على الإجابات السابقة
+const Q = [
+  {id:"age", q:"من الشخص الذي تريد احتواءه؟", opts:[
+    ["child","طفل","أصغر من 10 سنوات"],
+    ["teen","مراهق","من 10 إلى 18 سنة"],
+    ["adult","شخص بالغ","زميل، أحد أفراد الأسرة، صديق"]]},
+  {id:"danger", q:"هل يوجد خطر الآن: إيذاء نفسه أو غيره، أو حديث عن إيذاء النفس؟", opts:[
+    ["yes","نعم","ضرب، أداة خطرة، تهديد، كلام عن الموت أو إيذاء النفس"],
+    ["no","لا",""]]},
+  {id:"emotion", q:"ما الشعور الغالب الذي تلاحظه؟", opts:[
+    ["anger","غضب","صراخ، ضرب، رمي أشياء، كلام جارح"],
+    ["sad","حزن","بكاء، انطواء، صمت، فقدان الحماس"],
+    ["fear","خوف أو قلق","ارتجاف، تجنّب، أسئلة متكررة، شكوى من ألم في البطن"],
+    ["frust","إحباط","بعد فشل أو علامة منخفضة: «أنا غبي»، «لن أنجح»"],
+    ["defy","عناد ورفض","يرفض التنفيذ، يتحدّى، «لن أفعل»"]]},
+  {id:"intensity", q:"ما شدة الانفعال الآن؟", opts:[
+    ["low","خفيفة","يستطيع أن يتكلم بهدوء"],
+    ["mid","متوسطة","متوتر، لكنه يسمعك ويرد عليك"],
+    ["high","شديدة","نوبة: لا يسمع ولا يستجيب للكلام"]]},
+  {id:"place", q:"أين يحدث الموقف؟", opts:[
+    ["public","أمام الآخرين","في الصف، في الساحة، أمام العائلة"],
+    ["private","على انفراد",""]]},
+  {id:"cause", q:"هل تعرف سبب هذا الشعور؟", opts:[
+    ["known","نعم، أعرف السبب",""],
+    ["unknown","لا، السبب غير واضح",""]]},
+  {id:"repeat", q:"هل يتكرر هذا الموقف كثيراً في الأسابيع الأخيرة؟", opts:[
+    ["first","أول مرة أو نادراً",""],
+    ["often","يتكرر كثيراً",""]]},
+  {id:"change", q:"هل لاحظت تغيّراً واضحاً في نومه أو أكله أو دراسته أو علاقاته بالآخرين؟", opts:[
+    ["yes","نعم",""],["no","لا",""]],
+    ask: f => ["sad","fear"].includes(f.emotion) || f.repeat === "often"}
+];
+const QBY = Object.fromEntries(Q.map(q => [q.id, q]));
+
+// ===== الحقائق الوسيطة (يستنتجها النظام) =====
+const DERIVED = {
+  risk:"خطر على السلامة",
+  flooded:"فيضان انفعالي (لا يستطيع التفكير الآن)",
+  talkable:"قادر على الحوار",
+  audience:"وجود جمهور يضغط عليه",
+  concern:"مؤشر قلق يحتاج متخصصاً",
+  pattern:"نمط متكرر",
+  refer:"إحالة إلى متخصص"
+};
+
+const STAGES = {
+  0:"الأمان أولاً",
+  1:"الآن: التهدئة",
+  2:"بعد الهدوء: الحوار والفهم",
+  3:"لاحقاً: المتابعة"
+};
+
+// ===== قاعدة المعرفة =====
+// if: شروط (سؤال=إجابة أو اسم حقيقة وسيطة). then: حقيقة وسيطة تُضاف. tip: توصية تظهر في الخطة.
+const RULES = [
+  {id:"R1", if:["danger=yes"], then:"risk"},
+  {id:"R2", if:["risk"], then:"refer", stage:0, title:"حافظ على السلامة واطلب المساعدة فوراً",
+   tips:["لا تتركه وحده، وابقَ قريباً منه بهدوء.","أبعد الأدوات الخطرة وأبعد الآخرين عن مكان الخطر.","اطلب المساعدة فوراً من المرشد أو الإدارة أو الأهل، وفي الخطر المباشر اتصل بالطوارئ.","خذ أي حديث عن إيذاء النفس بجدية، حتى لو بدا مزاحاً."],
+   avoid:["لا تعده بأن تُبقي الأمر سراً."]},
+  {id:"R3", if:["intensity=high"], then:"flooded", stage:1, title:"التهدئة قبل أي كلام",
+   tips:["في النوبة الشديدة لا يعمل التفكير المنطقي، فأجّل النصيحة والعتاب.","اخفض صوتك وأبطئ حركتك، واستخدم كلمات قليلة جداً.","امنحه مساحة آمنة ووقتاً، وكن حاضراً دون أن تحاصره."],
+   say:["أنا هنا. نتكلم عندما تكون جاهزاً."]},
+  {id:"R4", if:["intensity=low"], then:"talkable"},
+  {id:"R5", if:["intensity=mid"], then:"talkable"},
+  {id:"R6", if:["place=public"], then:"audience"},
+  {id:"R7", if:["flooded","audience"], stage:1, title:"انقل الموقف بعيداً عن الأنظار",
+   tips:["اطلب من الآخرين متابعة عملهم، أو خذه بهدوء إلى مكان أهدأ.","الجمهور يزيد الانفعال، لأنه يشعر أنه يجب أن يدافع عن صورته."],
+   avoid:["لا تعاقبه ولا توبّخه أمام الآخرين."]},
+  {id:"R8", if:["talkable","audience"], stage:2, title:"احفظ ماء وجهه",
+   tips:["أجّل الحديث الجاد إلى وقت تكونان فيه على انفراد.","يمكن الاتفاق معه على إشارة سرية تعني: «أنا لاحظت، سنتكلم لاحقاً»."]},
+  {id:"R9", if:["emotion=anger"], stage:1, title:"احتواء الغضب",
+   tips:["سمِّ الشعور ليشعر أنك فهمته.","فرّق بين الشعور المقبول والسلوك غير المقبول.","اقترح طريقة لتفريغ الغضب: تنفّس عميق، شرب ماء، المشي قليلاً."],
+   say:["أرى أنك غاضب جداً.","مسموح أن تغضب، لكن غير مسموح أن تؤذي أحداً."],
+   avoid:["لا ترفع صوتك ولا تهدّد.","لا تقل له: «اهدأ!» بلهجة آمرة."]},
+  {id:"R10", if:["emotion=sad"], stage:1, title:"احتواء الحزن",
+   tips:["الحضور أهم من الكلام: اجلس بجانبه.","اسمح له بالبكاء، فالبكاء يريح.","اسأله عما يحتاجه بدل أن تفترض."],
+   say:["هل تريد أن تحكي لي، أم أبقى بجانبك فقط؟"],
+   avoid:["لا تقل: «لا تبكِ» أو «الأمر بسيط».","لا تسارع إلى الحلول قبل أن يشعر أنك فهمته."]},
+  {id:"R11", if:["emotion=fear"], stage:1, title:"احتواء الخوف والقلق",
+   tips:["طمئنه طمأنة صادقة وواقعية، دون وعود لا تملكها.","ساعده على التنفس ببطء: شهيق 4 ثوانٍ، ثم زفير 4 ثوانٍ.","قسّم الشيء المخيف إلى خطوات صغيرة."],
+   say:["خوفك مفهوم. نحن معاً، ونبدأ بخطوة صغيرة."],
+   avoid:["لا تسخر من خوفه ولا تقارنه بغيره.","لا تجبره على مواجهة ما يخيفه دفعة واحدة."]},
+  {id:"R12", if:["emotion=frust"], stage:2, title:"احتواء الإحباط",
+   tips:["افصل قيمته كإنسان عن النتيجة.","ذكّره بنجاح سابق حقيقي.","اتفقا على خطوة صغيرة يستطيع أن ينجح فيها اليوم."],
+   say:["لم تنجح فيها بعد، وهذا لا يعني أنك لن تنجح."],
+   avoid:["لا تقل: «قلت لك أن تدرس»."]},
+  {id:"R13", if:["emotion=defy"], stage:1, title:"احتواء العناد",
+   tips:["تجنّب صراع القوة: لا يوجد فائز في الجدال العلني.","اعرض خيارين مقبولين لك بدل الأمر المباشر.","ضع الحد بهدوء وثبات، وامنحه وقتاً ليستجيب."],
+   say:["تريد أن تبدأ بالسؤال الأول أم الثاني؟"],
+   avoid:["لا تدخل في جدال طويل أمام الآخرين.","لا تهدّد بعقوبة لن تنفذها."]},
+  {id:"R14", if:["age=child"], stage:1, title:"مع الطفل",
+   tips:["انزل إلى مستوى عينيه، واستخدم جملاً قصيرة بسيطة.","التلامس الهادئ أو الاحتضان يطمئنه إذا قبله.","الرسم واللعب يساعدانه على التعبير عما لا يستطيع قوله.","ركن هادئ في الصف يساعده على تهدئة نفسه."]},
+  {id:"R15", if:["age=teen"], stage:2, title:"مع المراهق",
+   tips:["استمع أكثر مما تتكلم، وتجنّب المحاضرات.","احترم خصوصيته، واعرض المساعدة دون فرضها.","تعامل معه باحترام كشخص قريب من البلوغ."],
+   avoid:["لا تسخر منه أمام أقرانه."]},
+  {id:"R16", if:["age=adult"], stage:2, title:"مع البالغ",
+   tips:["أعد صياغة ما سمعته ليتأكد أنك فهمته.","اسأله: «ماذا تحتاج مني الآن؟» قبل أن تنصح."]},
+  {id:"R17", if:["talkable","cause=unknown"], stage:2, title:"استكشف السبب",
+   tips:["اسأل «ماذا حدث؟» بدل «لماذا فعلت ذلك؟»، فـ«لماذا» تبدو اتهاماً.","يمكنك أن تخمّن بلطف: «هل حدث شيء في الاستراحة؟»."]},
+  {id:"R18", if:["flooded","cause=unknown"], stage:3, title:"ابحث عن السبب لاحقاً",
+   tips:["بعد أن يهدأ تماماً، اسأله بهدوء عما حدث.","اسأل من كان حاضراً، دون أن تحوّل الأمر إلى تحقيق."]},
+  {id:"R19", if:["cause=known"], stage:2, title:"عالجا السبب معاً",
+   tips:["بعد الهدوء، اسأله عن الحل الذي يقترحه هو أولاً.","اختارا معاً حلاً واحداً قابلاً للتنفيذ."]},
+  {id:"R20", if:["repeat=often"], then:"pattern", stage:3, title:"تعامل مع النمط المتكرر",
+   tips:["دوّن المواقف: متى حدثت؟ وأين؟ وماذا سبقها؟","تواصل مع الأهل أو المعلمين الآخرين لوضع خطة مشتركة.","علّمه في أوقات الهدوء طرقاً للتعامل مع الشعور قبل أن يشتد."]},
+  {id:"R21", if:["change=yes"], then:"concern"},
+  {id:"R22", if:["concern"], then:"refer"},
+  {id:"R23", if:["pattern","flooded"], then:"refer"},
+  {id:"R24", if:["refer"], stage:3, title:"أحِل الحالة إلى متخصص",
+   tips:["أبلغ المرشد التربوي أو الأخصائي النفسي في المدرسة.","أخبر الأهل بطريقة هادئة غير مخيفة، وركّز على الدعم لا على الاتهام.","الإحالة ليست فشلاً منك، بل جزء من الاحتواء."]},
+  {id:"R25", if:["danger=no"], stage:3, title:"أغلق الموقف بعلاقة أقوى",
+   tips:["عد إليه لاحقاً في اليوم نفسه، ولو بكلمة قصيرة.","اشكره لأنه هدأ أو لأنه تكلّم معك.","العلاقة الآمنة هي ما يجعل الاحتواء القادم أسهل."],
+   say:["شكراً لأنك تكلّمت معي. أنا موجود إذا احتجتني."]}
+];
+
+// ===== أدوات العرض =====
+const $ = s => document.querySelector(s);
+function label(cond){
+  if (cond in DERIVED) return `<span class="chip d">${DERIVED[cond]}</span>`;
+  if (cond in CHIP) return `<span class="chip">${CHIP[cond]}</span>`;
+  const [k, v] = cond.split("=");
+  const o = QBY[k].opts.find(o => o[0] === v);
+  return `<span class="chip">${o ? o[1] : v}</span>`;
+}
+// أسماء مختصرة للحقائق حين تظهر خارج سياق السؤال
+const CHIP = {
+  "danger=yes":"يوجد خطر", "danger=no":"لا يوجد خطر",
+  "change=yes":"تغيّر واضح في السلوك", "change=no":"لا تغيّر في السلوك",
+  "intensity=low":"انفعال خفيف", "intensity=mid":"انفعال متوسط", "intensity=high":"انفعال شديد",
+  "cause=known":"السبب معروف", "cause=unknown":"السبب غير واضح",
+  "repeat=first":"أول مرة", "repeat=often":"يتكرر كثيراً"
+};
+function fmtIf(r){ return r.if.map(label).join(' <span class="kw">و</span> '); }
+function fmtThen(r){
+  const parts = [];
+  if (r.then) parts.push(label(r.then));
+  if (r.title) parts.push(`توصية: <b>${r.title}</b>`);
+  return parts.join(" + ");
+}
+
+// ===== الاستشارة =====
+let facts = {}, step = 0, showWhy = false;
+
+function nextQ(){
+  while (step < Q.length && Q[step].ask && !Q[step].ask(facts)) step++;
+  return Q[step];
+}
+
+function renderQ(){
+  const q = nextQ();
+  if (!q) return renderResult();
+  const total = Q.filter(x => !x.ask || x.ask(facts)).length;
+  const done = Object.keys(facts).length;
+  const using = RULES.filter(r => r.if.some(c => c.startsWith(q.id + "=")));
+  $("#play").innerHTML = `
+    <div class="progress"><span>السؤال ${done + 1} من ${total}</span><span>الحقائق في الذاكرة: ${done}</span></div>
+    <div class="bar"><i style="width:${done / total * 100}%"></i></div>
+    <div class="q">${q.q}</div>
+    <div class="opts">${q.opts.map(([v, t, s]) =>
+      `<button class="opt" data-v="${v}"><b>${t}</b>${s ? `<small>${s}</small>` : ""}</button>`).join("")}</div>
+    ${showWhy ? `<div class="why"><b>لماذا أسأل هذا السؤال؟</b> لأن الإجابة تحدد هل تنطلق هذه القواعد:
+      <ul>${using.map(r => `<li><span class="id">${r.id}</span>: إذا ${fmtIf(r)} ← ${fmtThen(r)}</li>`).join("")}</ul></div>` : ""}
+    <div class="row">
+      <button class="link" id="why">${showWhy ? "إخفاء التفسير" : "لماذا هذا السؤال؟"}</button>
+      ${done ? `<button class="link" id="back">→ السؤال السابق</button><button class="link" id="restart">ابدأ من جديد</button>` : ""}
+    </div>`;
+  $("#play").querySelectorAll(".opt").forEach(b => b.onclick = () => {
+    facts[q.id] = b.dataset.v; step++; renderQ();
+  });
+  $("#why").onclick = () => { showWhy = !showWhy; renderQ(); };
+  if (done){ $("#back").onclick = goBack; $("#restart").onclick = restart; }
+}
+
+function goBack(){
+  const answered = Q.filter(q => q.id in facts);
+  const last = answered[answered.length - 1];
+  if (!last) return;
+  delete facts[last.id];
+  step = Q.indexOf(last);
+  // احذف الإجابات المشروطة التي لم تعد صالحة
+  Q.forEach(q => { if (q.ask && q.id in facts && !q.ask(facts)) delete facts[q.id]; });
+  renderQ();
+}
+function restart(){ facts = {}; step = 0; renderQ(); }
+
+// ===== محرك الاستدلال: التسلسل الأمامي =====
+function infer(){
+  const wm = new Set(Object.entries(facts).map(([k, v]) => k + "=" + v));
+  const fired = [], trace = [];
+  let cycle = 0, changed = true;
+  while (changed){
+    changed = false; cycle++;
+    const now = RULES.filter(r => !fired.includes(r) && r.if.every(c => wm.has(c)));
+    now.forEach(r => {
+      fired.push(r);
+      if (r.then) wm.add(r.then);
+      trace.push({c:cycle, r});
+      changed = true;
+    });
+  }
+  return {wm, fired, trace, cycles: cycle - 1};
+}
+
+function renderResult(){
+  const {wm, fired, trace, cycles} = infer();
+  const tips = fired.filter(r => r.title);
+  const avoid = tips.flatMap(r => (r.avoid || []).map(a => [a, r.id]));
+  let html = "";
+  if (wm.has("risk")) html += `<div class="alert"><h3>⚠️ يوجد خطر على السلامة</h3>
+    السلامة تسبق أي خطوة أخرى. اتبع المرحلة الأولى فوراً، واطلب المساعدة من شخص بالغ مسؤول.</div>`;
+  html += `<h2 style="margin:0 0 4px;font-size:1.25rem">خطة الاحتواء المقترحة</h2>
+    <p style="margin:0;color:var(--muted);font-size:.92rem">الحقائق المدخلة: ${Object.keys(facts).length} · دورات الاستدلال: ${cycles} · القواعد التي انطلقت: ${fired.length}</p>`;
+  let n = 0;
+  [0,1,2,3].forEach(s => {
+    const items = tips.filter(r => r.stage === s).sort((a, b) => RULES.indexOf(a) - RULES.indexOf(b));
+    if (!items.length) return;
+    n++;
+    html += `<div class="stage"><h3><span class="n">${n}</span>${STAGES[s]}</h3>` +
+      items.map(r => `<div class="tip"><span class="src">${r.id}</span><h4>${r.title}</h4><ul>
+        ${r.tips.map(t => `<li>${t}</li>`).join("")}</ul>
+        ${(r.say || []).map(t => `<span class="say">قل: «${t}»</span>`).join("")}</div>`).join("") + `</div>`;
+  });
+  if (avoid.length) html += `<div class="stage"><h3><span class="n" style="background:var(--red)">✕</span>تجنّب</h3>
+    <div class="avoid"><ul>${avoid.map(([a]) => `<li>${a}</li>`).join("")}</ul></div></div>`;
+  html += `<details><summary>كيف وصل النظام إلى هذه الخطة؟</summary>
+    <p style="margin:10px 0 4px"><b>الحقائق التي أدخلتها:</b><br>${Object.entries(facts).map(([k, v]) => label(k + "=" + v)).join("")}</p>
+    <p style="margin:6px 0 4px"><b>الحقائق التي استنتجها النظام:</b><br>${[...wm].filter(f => f in DERIVED).map(label).join("") || "لا يوجد"}</p>
+    <ul class="trace">${trace.map(({c, r}) =>
+      `<li data-c="${c}"><b>${r.id}</b>: إذا ${fmtIf(r)} ← ${fmtThen(r)}</li>`).join("")}</ul></details>
+    <div class="row"><button class="primary" id="restart">موقف جديد</button>
+    <button class="link" id="back">→ عدّل آخر إجابة</button>
+    <button class="link" onclick="print()">اطبع الخطة</button></div>`;
+  $("#play").innerHTML = html;
+  $("#restart").onclick = restart;
+  $("#back").onclick = goBack;
+}
+
+// ===== قاعدة المعرفة =====
+function renderKB(){
+  $("#kb").innerHTML = `<p style="margin-top:0">تتكون قاعدة المعرفة من <b>${RULES.length} قاعدة</b> بصيغة «إذا … فإن …». الحقائق
+    <span class="chip">الخضراء</span> تأتي من إجاباتك، و<span class="chip d">البنفسجية</span> يستنتجها النظام.</p>` +
+    RULES.map(r => `<div class="rule"><span class="id">${r.id}</span>${r.stage !== undefined ? ` · <span style="color:var(--muted);font-size:.8rem">${STAGES[r.stage]}</span>` : ""}<br>
+      <span class="kw">إذا</span> ${fmtIf(r)}<br><span class="kw">فإن</span> ${fmtThen(r)}</div>`).join("");
+}
+
+// ===== التبويبات =====
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("nav button").forEach(x => x.classList.toggle("on", x === b));
+  ["play","kb","how"].forEach(id => $("#" + id).classList.toggle("hidden", id !== b.dataset.tab));
+});
+
+renderKB();
+renderQ();
+</script>
+</body>
+</html>

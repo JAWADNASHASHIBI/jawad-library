@@ -73,7 +73,8 @@ const SITE = "https://" + USER + ".github.io/";
 // قائمة احتياطية تظهر إذا لم يتصل بـ GitHub. أضف هنا أي مشروع جديد إن أردت.
 const FALLBACK = [
   {name:"classify-living-things", title:"تصنيف الكائنات الحية", icon:"🌿"},
-  {name:"diagnosis-expert-app",   title:"تشخيص أمراض الجهاز الهضمي", icon:"🩺"}
+  {name:"diagnosis-expert-app",   title:"تشخيص أمراض الجهاز الهضمي", icon:"🩺"},
+  {name:"containment", title:"الاحتواء العاطفي والتربوي", icon:"🤝", url:"containment/"}
 ];
 // أيقونات اختيارية حسب اسم المستودع
 // مستودعات لا تظهر في المكتبة (المكتبة نفسها)
@@ -82,7 +83,7 @@ const ICONS = {"classify-living-things":"🌿","diagnosis-expert-app":"🩺"};
 
 function draw(list){
   document.getElementById('shelf').innerHTML = list.map(p => `
-    <a class="book" href="${SITE}${p.name}/">
+    <a class="book" href="${p.url || SITE + p.name + "/"}">
       <div class="icon">${p.icon || ICONS[p.name] || "📘"}</div>
       <h2>${p.title || p.name}</h2>
       <div class="slug">${p.name}</div>
