@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>غرفة الهروب: مختبر الرسوم البيانية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f1ea; --card:#ffffff; --ink:#1f2328; --muted:#5f6670; --line:#d9d4c7;
+  --accent:#0f7b6c; --accent-soft:#dff3ee; --warn:#b45309; --bad:#c2410c; --bad-soft:#fdebe3;
+  --node:#ede9fe; --node-stroke:#5b4bc4; --node-ink:#2e2477; --edge:#8a8a85;
+  --c1:#f59e0b; --c2:#3b82f6; --c3:#ec4899;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#16181c; --card:#1f2227; --ink:#eceae4; --muted:#a3a7ad; --line:#353941;
+    --accent:#3cc4ab; --accent-soft:#163a34; --warn:#f0a44b; --bad:#f08a5d; --bad-soft:#3d2219;
+    --node:#2d2752; --node-stroke:#a99cf5; --node-ink:#ece8ff; --edge:#7d7f85;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Cairo',system-ui,sans-serif;line-height:1.7}
+.wrap{max-width:760px;margin:0 auto;padding:20px 16px 60px}
+header{text-align:center;padding:12px 0 8px}
+h1{font-size:28px;font-weight:800;margin:0 0 4px}
+.story{color:var(--muted);margin:0 auto 16px;max-width:600px}
+.hud{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;margin-bottom:20px;position:sticky;top:0;background:var(--bg);padding:10px 0;z-index:5;border-bottom:1px solid var(--line)}
+.slots{display:flex;gap:8px;direction:ltr}
+.slot{width:42px;height:50px;border:2px dashed var(--line);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;background:var(--card)}
+.slot.on{border:2px solid var(--accent);color:var(--accent);background:var(--accent-soft)}
+.timer{font-variant-numeric:tabular-nums;font-weight:600;color:var(--muted);direction:ltr}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;margin-bottom:18px;position:relative}
+.card.locked{opacity:.45;pointer-events:none;filter:grayscale(.6)}
+.card.locked::after{content:"🔒 حلّ المحطة السابقة لفتح هذه";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:var(--ink)}
+.card.locked > *{visibility:hidden}
+.card.done{border-color:var(--accent)}
+.tag{display:inline-block;font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:2px 10px;border-radius:999px;margin-bottom:6px}
+h2{font-size:21px;margin:0 0 6px;font-weight:800}
+p{margin:0 0 10px}
+.task{background:var(--bg);border-radius:10px;padding:10px 12px;margin:8px 0 12px}
+svg.board{width:100%;height:auto;display:block;background:var(--bg);border-radius:12px;touch-action:none;user-select:none;-webkit-user-select:none}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+button{font-family:inherit;font-size:15px;font-weight:600;padding:7px 16px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--accent)}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+input[type=number],input[type=text]{font-family:inherit;font-size:18px;width:120px;padding:6px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);text-align:center}
+input[type=range]{width:180px;accent-color:var(--accent)}
+.msg{min-height:26px;margin-top:10px;font-weight:600}
+.msg.ok{color:var(--accent)}
+.msg.bad{color:var(--bad)}
+.msg.info{color:var(--warn)}
+.hint{display:none;margin-top:8px;padding:8px 12px;border-right:4px solid var(--warn);background:var(--bg);color:var(--muted)}
+.hint.show{display:block}
+.stat{font-weight:800}
+.reward{display:none;margin-top:10px;padding:10px 14px;border-radius:10px;background:var(--accent-soft);color:var(--accent);font-weight:800}
+.reward.show{display:block}
+.win{display:none;text-align:center;padding:28px 18px}
+.win.show{display:block}
+.win .big{font-size:40px;font-weight:800;color:var(--accent);margin:4px 0}
+.vtext{font-family:'Cairo',sans-serif;font-weight:800;pointer-events:none}
+.legend{display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted)}
+.dot{width:16px;height:16px;border-radius:50%;display:inline-block}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>🔐 غرفة الهروب: مختبر الرسوم البيانية</h1>
+  <p class="story">أُغلق عليكم باب مختبر الرياضيات! القفل يحتاج رمزاً من خمسة أرقام. كل محطة تحلّونها تكشف رقماً واحداً. حلّوا المحطات الخمس بالترتيب، ثم افتحوا الباب.</p>
+</header>
+
+<div class="hud">
+  <div class="slots" id="slots"></div>
+  <div class="timer">⏱ <span id="timer">00:00</span></div>
+</div>
+
+<!-- Stage 1 -->
+<section class="card" id="s0">
+  <span class="tag">المحطة 1</span>
+  <h2>مصافحة العلماء</h2>
+  <p>كل عالم في المختبر صافح كل عالم آخر مرة واحدة فقط. في الرسم: كل نقطة عالم، وكل خط مصافحة.</p>
+  <div class="row"><label>عدد العلماء: <span class="stat" id="nOut">3</span></label><input type="range" id="nRange" min="2" max="6" value="3" step="1"></div>
+  <svg class="board" id="hsSvg" viewBox="0 0 360 240"></svg>
+  <p style="margin-top:8px">عدد المصافحات: <span class="stat" id="hsCount">3</span></p>
+  <div class="task">اكتشف النمط. إذا اجتمع <b>8 علماء</b>، فكم مصافحة ستحدث؟</div>
+  <div class="row"><input type="number" id="hsAns" placeholder="؟"><button class="primary" id="hsCheck">تحقّق</button><button id="hsHintBtn">تلميح</button></div>
+  <div class="hint" id="hsHint">كل عالم يصافح 7 علماء. لكن كل مصافحة تُحسب مرتين (مرة لكل شخص). جرّب: 8 × 7 ÷ 2</div>
+  <div class="msg" id="hsMsg"></div>
+  <div class="reward" id="r0"></div>
+</section>
+
+<!-- Stage 2 -->
+<section class="card locked" id="s1">
+  <span class="tag">المحطة 2</span>
+  <h2>فكّ التشابك</h2>
+  <p>أسلاك جهاز فتح الباب متشابكة! اسحب النقاط بإصبعك أو بالماوس حتى لا يتقاطع أي سلكين. الأسلاك المتقاطعة تظهر باللون الأحمر.</p>
+  <svg class="board" id="plSvg" viewBox="0 0 360 300"></svg>
+  <p style="margin-top:8px">عدد التقاطعات: <span class="stat" id="plCount">0</span></p>
+  <div class="row"><button id="plReset">ابدأ من جديد</button><button id="plHintBtn">تلميح</button></div>
+  <div class="hint" id="plHint">ابدأ بالنقطة التي تتصل بأكثر عدد من الأسلاك وضعها في الوسط، ثم رتّب الباقي حولها كدائرة.</div>
+  <div class="msg" id="plMsg"></div>
+  <div class="reward" id="r1"></div>
+</section>
+
+<!-- Stage 3 -->
+<section class="card locked" id="s2">
+  <span class="tag">المحطة 3</span>
+  <h2>البيت السحري (مسار أويلر)</h2>
+  <p>ارسم البيت كله دون أن ترفع القلم، ودون أن تمر على أي خط مرتين. اضغط على نقطة البداية، ثم اضغط على النقاط واحدة بعد الأخرى.</p>
+  <svg class="board" id="euSvg" viewBox="0 0 360 300"></svg>
+  <p style="margin-top:8px">خطوط مرسومة: <span class="stat" id="euCount">0</span> من <span id="euTotal">8</span></p>
+  <div class="row"><button id="euReset">ابدأ من جديد</button><button id="euDeg">أظهر عدد الخطوط عند كل نقطة</button><button id="euHintBtn">تلميح</button></div>
+  <div class="hint" id="euHint">انظر إلى عدد الخطوط عند كل نقطة. إذا كان هناك نقطتان فيهما عدد فردي من الخطوط، فيجب أن تبدأ من إحداهما وتنتهي عند الأخرى.</div>
+  <div class="msg" id="euMsg"></div>
+  <div class="reward" id="r2"></div>
+</section>
+
+<!-- Stage 4 -->
+<section class="card locked" id="s3">
+  <span class="tag">المحطة 4</span>
+  <h2>أقصر طريق إلى المدرسة</h2>
+  <p>تبدأ من <b>البيت</b>. اضغط على الأماكن بالترتيب لتصل إلى <b>المدرسة</b> بأقصر مسافة ممكنة. الأرقام على الطرق هي المسافات بالكيلومتر.</p>
+  <svg class="board" id="spSvg" viewBox="0 0 360 300"></svg>
+  <p style="margin-top:8px">الطريق: <span id="spPath"></span></p>
+  <p>المسافة الكلية: <span class="stat" id="spTotal">0</span> كم</p>
+  <div class="row"><button id="spUndo">تراجع خطوة</button><button id="spReset">ابدأ من جديد</button><button id="spHintBtn">تلميح</button></div>
+  <div class="hint" id="spHint">الطريق المباشر ليس دائماً الأقصر! أحياناً المرور بمكان إضافي يوفّر مسافة. احسب المسافة من البيت إلى كل مكان خطوة بخطوة.</div>
+  <div class="msg" id="spMsg"></div>
+  <div class="reward" id="r3"></div>
+</section>
+
+<!-- Stage 5 -->
+<section class="card locked" id="s4">
+  <span class="tag">المحطة 5</span>
+  <h2>تلوين الغرف</h2>
+  <p>في المختبر 6 غرف. كل خط يعني أن الغرفتين متجاورتان. لوّن كل غرفة بحيث لا تأخذ غرفتان متجاورتان نفس اللون. عندك <b>3 ألوان فقط</b>. اضغط على النقطة لتغيير لونها.</p>
+  <div class="legend"><span class="dot" style="background:var(--c1)"></span><span class="dot" style="background:var(--c2)"></span><span class="dot" style="background:var(--c3)"></span> الضغط المتكرر يبدّل بين الألوان</div>
+  <svg class="board" id="coSvg" viewBox="0 0 360 300" style="margin-top:8px"></svg>
+  <div class="row"><button id="coReset">امسح الألوان</button><button id="coHintBtn">تلميح</button></div>
+  <div class="hint" id="coHint">ابدأ بالمثلث في الوسط: نقاطه الثلاث متصلة ببعضها، لذلك تحتاج 3 ألوان مختلفة. بعدها كل نقطة خارجية لها لون واحد فقط ممكن.</div>
+  <div class="msg" id="coMsg"></div>
+  <div class="reward" id="r4"></div>
+</section>
+
+<!-- Final -->
+<section class="card locked" id="s5">
+  <span class="tag">الباب</span>
+  <h2>افتح الباب!</h2>
+  <p>أدخل الأرقام الخمسة التي جمعتها بالترتيب.</p>
+  <div class="row"><input type="text" id="finalAns" inputmode="numeric" maxlength="5" placeholder="•••••" style="width:160px;letter-spacing:6px;direction:ltr"><button class="primary" id="finalCheck">افتح</button></div>
+  <div class="msg" id="finalMsg"></div>
+</section>
+
+<section class="card win" id="win">
+  <div style="font-size:54px">🎉</div>
+  <div class="big">هربتم من المختبر!</div>
+  <p>الوقت: <span class="stat" id="winTime"></span></p>
+  <p>هل لاحظتم الرمز؟ <b>3.1415</b>… إنها أول أرقام العدد π!</p>
+  <p style="color:var(--muted)">تعلمتم اليوم: المصافحات (عدد الأضلاع في رسم كامل)، الرسوم المستوية، مسار أويلر، أقصر طريق، وتلوين الرسوم البيانية.</p>
+</section>
+</div>
+
+<script>
+const NS='http://www.w3.org/2000/svg';
+const CODE=[3,1,4,1,5];
+const solved=[false,false,false,false,false];
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+function $(id){return document.getElementById(id)}
+function svgPt(svg,ev){const r=svg.getBoundingClientRect(),vb=svg.viewBox.baseVal;return{x:(ev.clientX-r.left)*vb.width/r.width,y:(ev.clientY-r.top)*vb.height/r.height}}
+function msg(id,text,kind){const m=$(id);m.textContent=text;m.className='msg '+(kind||'')}
+function cssv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
+
+const slots=$('slots');
+CODE.forEach(()=>{const d=document.createElement('div');d.className='slot';d.textContent='?';slots.appendChild(d)});
+
+const t0=Date.now();let timerOn=true;
+function fmt(ms){const s=Math.floor(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+setInterval(()=>{if(timerOn)$('timer').textContent=fmt(Date.now()-t0)},500);
+
+function solve(i){
+  if(solved[i])return;solved[i]=true;
+  const s=slots.children[i];s.textContent=CODE[i];s.classList.add('on');
+  $('s'+i).classList.add('done');
+  const r=$('r'+i);r.textContent='🔓 أحسنت! الرقم '+(i+1)+' في الرمز هو: '+CODE[i];r.classList.add('show');
+  const next=$('s'+(i+1));next.classList.remove('locked');
+  setTimeout(()=>next.scrollIntoView({behavior:'smooth',block:'start'}),900);
+}
+['hs','pl','eu','sp','co'].forEach(p=>{$(p+'HintBtn').onclick=()=>$(p+'Hint').classList.toggle('show')});
+
+function node(svg,x,y,label,r){
+  const g=el('g',{transform:`translate(${x},${y})`,style:'cursor:pointer'},svg);
+  const c=el('circle',{r:r||18,fill:cssv('--node'),stroke:cssv('--node-stroke'),'stroke-width':2},g);
+  const t=el('text',{class:'vtext','text-anchor':'middle','dominant-baseline':'central','font-size':15,fill:cssv('--node-ink')},g);
+  t.textContent=label==null?'':label;
+  return {g,c,t};
+}
+
+/* ---------- Stage 1: handshakes ---------- */
+(function(){
+  const svg=$('hsSvg');
+  function draw(n){
+    svg.innerHTML='';
+    const pts=[];for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;pts.push([180+85*Math.cos(a),120+85*Math.sin(a)])}
+    for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)el('line',{x1:pts[i][0],y1:pts[i][1],x2:pts[j][0],y2:pts[j][1],stroke:cssv('--accent'),'stroke-width':2.5},svg);
+    pts.forEach(p=>node(svg,p[0],p[1],'🧑‍🔬',17));
+    $('nOut').textContent=n;$('hsCount').textContent=n*(n-1)/2;
+  }
+  $('nRange').oninput=e=>draw(+e.target.value);draw(3);
+  $('hsCheck').onclick=()=>{
+    const v=$('hsAns').value.trim();
+    if(v===''){msg('hsMsg','اكتب إجابة أولاً.','info');return}
+    if(+v===28){msg('hsMsg','صحيح! 8 × 7 ÷ 2 = 28 مصافحة.','ok');solve(0)}
+    else msg('hsMsg','ليس بعد. جرّب عدداً أقل من العلماء ولاحظ كيف يكبر العدد.','bad');
+  };
+})();
+
+/* ---------- Stage 2: untangle (planar) ---------- */
+(function(){
+  const svg=$('plSvg');
+  const E=[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[0,2],[0,3],[0,4]];
+  const order=[0,3,5,1,4,2];
+  function startPos(){const P=[];order.forEach((v,k)=>{const a=-Math.PI/2+k*2*Math.PI/6;P[v]=[180+110*Math.cos(a),150+110*Math.sin(a)]});return P}
+  let P=startPos(),lines=[],nodes=[],drag=-1;
+  function orient(a,b,c){const v=(b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]);return Math.abs(v)<1e-9?0:(v>0?1:-1)}
+  function cross(e,f){if(e[0]===f[0]||e[0]===f[1]||e[1]===f[0]||e[1]===f[1])return false;
+    const a=P[e[0]],b=P[e[1]],c=P[f[0]],d=P[f[1]];
+    return orient(a,b,c)*orient(a,b,d)<0&&orient(c,d,a)*orient(c,d,b)<0}
+  function build(){
+    svg.innerHTML='';
+    lines=E.map(()=>el('line',{'stroke-width':4,'stroke-linecap':'round'},svg));
+    nodes=P.map((p,i)=>{const n=node(svg,0,0,'',20);
+      n.g.addEventListener('pointerdown',ev=>{drag=i;n.g.setPointerCapture(ev.pointerId)});
+      n.g.addEventListener('pointermove',ev=>{if(drag!==i)return;const q=svgPt(svg,ev);P[i]=[Math.max(22,Math.min(338,q.x)),Math.max(22,Math.min(278,q.y))];draw()});
+      n.g.addEventListener('pointerup',()=>{drag=-1;check()});
+      return n});
+    draw();
+  }
+  function draw(){
+    const bad=E.map(()=>false);let count=0;
+    for(let i=0;i<E.length;i++)for(let j=i+1;j<E.length;j++)if(cross(E[i],E[j])){bad[i]=bad[j]=true;count++}
+    E.forEach((e,k)=>{const a=P[e[0]],b=P[e[1]];const l=lines[k];l.setAttribute('x1',a[0]);l.setAttribute('y1',a[1]);l.setAttribute('x2',b[0]);l.setAttribute('y2',b[1]);l.setAttribute('stroke',bad[k]?cssv('--bad'):cssv('--accent'))});
+    nodes.forEach((n,i)=>n.g.setAttribute('transform',`translate(${P[i][0]},${P[i][1]})`));
+    $('plCount').textContent=count;return count;
+  }
+  function check(){if(draw()===0&&!solved[1]){msg('plMsg','رائع! لا توجد أي تقاطعات. هذا رسم بياني مستوٍ.','ok');solve(1)}}
+  $('plReset').onclick=()=>{P=startPos();draw()};
+  build();
+})();
+
+/* ---------- Stage 3: Euler path ---------- */
+(function(){
+  const svg=$('euSvg');
+  const V=[[85,270],[275,270],[275,140],[85,140],[180,35]];
+  const E=[[0,1],[1,2],[2,3],[3,0],[0,2],[1,3],[3,4],[2,4]];
+  const deg=V.map((_,i)=>E.filter(e=>e.includes(i)).length);
+  let path=[],used=new Set(),showDeg=false,lines=[],nodes=[];
+  function build(){
+    svg.innerHTML='';
+    lines=E.map(e=>el('line',{x1:V[e[0]][0],y1:V[e[0]][1],x2:V[e[1]][0],y2:V[e[1]][1],'stroke-width':5,'stroke-linecap':'round'},svg));
+    nodes=V.map((p,i)=>{const n=node(svg,p[0],p[1],'',20);n.g.addEventListener('pointerdown',()=>tap(i));return n});
+    draw();
+  }
+  function draw(){
+    lines.forEach((l,k)=>{l.setAttribute('stroke',used.has(k)?cssv('--accent'):cssv('--edge'));l.setAttribute('stroke-dasharray',used.has(k)?'':'7 7')});
+    const cur=path[path.length-1];
+    nodes.forEach((n,i)=>{n.t.textContent=showDeg?deg[i]:'';n.c.setAttribute('fill',i===cur?cssv('--accent'):cssv('--node'));n.t.setAttribute('fill',i===cur?'#fff':cssv('--node-ink'))});
+    $('euCount').textContent=used.size;$('euTotal').textContent=E.length;
+  }
+  function tap(v){
+    if(solved[2])return;
+    if(path.length===0){path=[v];msg('euMsg','بدأت من هنا. اضغط على نقطة متصلة بها.','info');draw();return}
+    const cur=path[path.length-1];
+    const k=E.findIndex((e,idx)=>!used.has(idx)&&((e[0]===cur&&e[1]===v)||(e[1]===cur&&e[0]===v)));
+    if(k<0){msg('euMsg',v===cur?'أنت على هذه النقطة الآن.':'لا يوجد خط غير مرسوم بين النقطتين.','bad');return}
+    used.add(k);path.push(v);
+    if(used.size===E.length){draw();msg('euMsg','مذهل! رسمت البيت كله بخط واحد.','ok');solve(2);return}
+    const left=E.some((e,idx)=>!used.has(idx)&&(e[0]===v||e[1]===v));
+    if(!left)msg('euMsg','علقت! لا توجد خطوط متبقية من هذه النقطة. اضغط "ابدأ من جديد" وجرّب نقطة بداية أخرى.','bad');
+    else msg('euMsg','','');
+    draw();
+  }
+  $('euReset').onclick=()=>{if(solved[2])return;path=[];used=new Set();msg('euMsg','','');draw()};
+  $('euDeg').onclick=()=>{showDeg=!showDeg;draw()};
+  build();
+})();
+
+/* ---------- Stage 4: shortest path ---------- */
+(function(){
+  const svg=$('spSvg');
+  const names=['البيت','الفرن','السوق','المكتبة','الحديقة','المدرسة'];
+  const icons=['🏠','🥖','🛒','📚','🌳','🏫'];
+  const V=[[40,150],[135,55],[135,245],[245,55],[245,245],[322,150]];
+  const E=[[0,1,4],[0,2,2],[1,2,1],[1,3,5],[2,3,8],[2,4,10],[3,4,2],[3,5,6],[4,5,3]];
+  const START=0,END=5;
+  function dijkstra(){const d=V.map(()=>Infinity),done=V.map(()=>false);d[START]=0;
+    for(let it=0;it<V.length;it++){let u=-1;for(let i=0;i<V.length;i++)if(!done[i]&&(u<0||d[i]<d[u]))u=i;done[u]=true;
+      E.forEach(([a,b,w])=>{if(a===u&&d[u]+w<d[b])d[b]=d[u]+w;if(b===u&&d[u]+w<d[a])d[a]=d[u]+w})}
+    return d[END]}
+  const BEST=dijkstra();
+  let path=[START],lines=[],nodes=[];
+  function edgeIdx(a,b){return E.findIndex(e=>(e[0]===a&&e[1]===b)||(e[0]===b&&e[1]===a))}
+  function build(){
+    svg.innerHTML='';
+    lines=E.map(e=>el('line',{x1:V[e[0]][0],y1:V[e[0]][1],x2:V[e[1]][0],y2:V[e[1]][1],'stroke-width':4,'stroke-linecap':'round'},svg));
+    E.forEach(e=>{const mx=(V[e[0]][0]+V[e[1]][0])/2,my=(V[e[0]][1]+V[e[1]][1])/2;
+      el('circle',{cx:mx,cy:my,r:13,fill:cssv('--card'),stroke:cssv('--line')},svg);
+      const t=el('text',{x:mx,y:my,class:'vtext','text-anchor':'middle','dominant-baseline':'central','font-size':14,fill:cssv('--ink')},svg);t.textContent=e[2]});
+    nodes=V.map((p,i)=>{const n=node(svg,p[0],p[1],icons[i],22);
+      const lab=el('text',{x:0,y:i===1||i===3?-32:36,class:'vtext','text-anchor':'middle','font-size':13,fill:cssv('--ink')},n.g);lab.textContent=names[i];
+      n.g.addEventListener('pointerdown',()=>tap(i));return n});
+    draw();
+  }
+  function total(){let s=0;for(let i=1;i<path.length;i++)s+=E[edgeIdx(path[i-1],path[i])][2];return s}
+  function draw(){
+    const on=new Set();for(let i=1;i<path.length;i++)on.add(edgeIdx(path[i-1],path[i]));
+    lines.forEach((l,k)=>l.setAttribute('stroke',on.has(k)?cssv('--accent'):cssv('--edge')));
+    const cur=path[path.length-1];
+    nodes.forEach((n,i)=>n.c.setAttribute('fill',i===cur?cssv('--accent-soft'):cssv('--node')));
+    nodes.forEach((n,i)=>n.c.setAttribute('stroke',path.includes(i)?cssv('--accent'):cssv('--node-stroke')));
+    $('spPath').textContent=path.map(i=>names[i]).join(' ← ');
+    $('spTotal').textContent=total();
+  }
+  function tap(v){
+    if(solved[3])return;
+    const cur=path[path.length-1];
+    if(cur===END){msg('spMsg','وصلت إلى المدرسة. اضغط "ابدأ من جديد" أو "تراجع خطوة" لتجرّب طريقاً آخر.','info');return}
+    if(edgeIdx(cur,v)<0){msg('spMsg','لا يوجد طريق مباشر بين '+names[cur]+' و'+names[v]+'.','bad');return}
+    path.push(v);draw();
+    if(v===END){const t=total();
+      if(t===BEST){msg('spMsg','ممتاز! '+t+' كم هي أقصر مسافة ممكنة.','ok');solve(3)}
+      else msg('spMsg','وصلت بمسافة '+t+' كم، لكن هناك طريق أقصر! حاول مرة أخرى.','bad');
+    }else msg('spMsg','','');
+  }
+  $('spUndo').onclick=()=>{if(solved[3]||path.length<2)return;path.pop();msg('spMsg','','');draw()};
+  $('spReset').onclick=()=>{if(solved[3])return;path=[START];msg('spMsg','','');draw()};
+  build();
+})();
+
+/* ---------- Stage 5: coloring ---------- */
+(function(){
+  const svg=$('coSvg');
+  const V=[];for(let i=0;i<6;i++){const a=-Math.PI/2+i*Math.PI/3;V.push([180+115*Math.cos(a),150+115*Math.sin(a)])}
+  const E=[[0,1],[1,2],[2,3],[3,4],[4,5],[5,0],[0,2],[2,4],[4,0]];
+  const labels=['أ','ب','ج','د','هـ','و'];
+  let col=V.map(()=>0),lines=[],nodes=[];
+  const COLORS=()=>[cssv('--node'),cssv('--c1'),cssv('--c2'),cssv('--c3')];
+  function build(){
+    svg.innerHTML='';
+    lines=E.map(e=>el('line',{x1:V[e[0]][0],y1:V[e[0]][1],x2:V[e[1]][0],y2:V[e[1]][1],'stroke-width':4,'stroke-linecap':'round'},svg));
+    nodes=V.map((p,i)=>{const n=node(svg,p[0],p[1],labels[i],22);n.g.addEventListener('pointerdown',()=>tap(i));return n});
+    draw();
+  }
+  function draw(){
+    const C=COLORS();let conflicts=0;
+    E.forEach((e,k)=>{const bad=col[e[0]]&&col[e[0]]===col[e[1]];if(bad)conflicts++;lines[k].setAttribute('stroke',bad?cssv('--bad'):cssv('--edge'));lines[k].setAttribute('stroke-width',bad?7:4)});
+    nodes.forEach((n,i)=>{n.c.setAttribute('fill',C[col[i]]);n.t.setAttribute('fill',col[i]?'#fff':cssv('--node-ink'))});
+    return conflicts;
+  }
+  function tap(i){
+    if(solved[4])return;
+    col[i]=(col[i]+1)%4;const c=draw();
+    if(c>0)msg('coMsg','انتبه! الخط الأحمر يعني أن غرفتين متجاورتين لهما نفس اللون.','bad');
+    else if(col.every(x=>x>0)){msg('coMsg','أحسنت! كل غرفة لها لون مختلف عن جيرانها بثلاثة ألوان فقط.','ok');solve(4)}
+    else msg('coMsg','','');
+  }
+  $('coReset').onclick=()=>{if(solved[4])return;col=V.map(()=>0);msg('coMsg','','');draw()};
+  build();
+})();
+
+/* ---------- Final ---------- */
+$('finalCheck').onclick=()=>{
+  const v=$('finalAns').value.replace(/\s/g,'');
+  if(v===''){msg('finalMsg','أدخل الرمز أولاً.','info');return}
+  if(v===CODE.join('')){timerOn=false;msg('finalMsg','🔓 انفتح الباب!','ok');$('winTime').textContent=fmt(Date.now()-t0);$('win').classList.add('show');setTimeout(()=>$('win').scrollIntoView({behavior:'smooth'}),300)}
+  else msg('finalMsg','الرمز غير صحيح. راجع الأرقام بالأعلى.','bad');
+};
+$('finalAns').addEventListener('input',()=>msg('finalMsg','',''));
+$('hsAns').addEventListener('input',()=>msg('hsMsg','',''));
+</script>
+</body>
+</html>
