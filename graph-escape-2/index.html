@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>غرفة الهروب 2: مختبر الرسوم البيانية — المستوى المتقدم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1730; --panel:#18233f; --panel2:#1f2c4f; --ink:#eef2ff; --muted:#a9b4d6;
+  --accent:#ffc94d; --ok:#3ddc97; --bad:#ff5c6c; --line:#6c7bb0; --blue:#5aa9ff;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:"Tajawal",system-ui,"Segoe UI",Tahoma,sans-serif;background:radial-gradient(circle at 20% 0%,#1d2b57 0,var(--bg) 60%);color:var(--ink);min-height:100vh;line-height:1.7}
+.wrap{max-width:860px;margin:0 auto;padding:16px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+h1{font-size:1.45rem;margin:0;font-weight:800}
+h1 small{display:block;font-size:.9rem;color:var(--accent);font-weight:500}
+.timer{background:var(--panel);border:1px solid #2c3b66;border-radius:12px;padding:6px 14px;font-size:1.15rem;font-weight:700;direction:ltr}
+.code-bar{display:flex;gap:8px;justify-content:center;margin:8px 0 16px;direction:ltr}
+.slot{width:46px;height:56px;border-radius:10px;background:var(--panel);border:2px dashed #3a4a7a;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800;color:var(--muted)}
+.slot.got{border:2px solid var(--accent);color:var(--accent);background:#2a2a1a}
+.slot.cur{border-color:var(--blue)}
+.card{background:var(--panel);border:1px solid #2c3b66;border-radius:18px;padding:18px;box-shadow:0 10px 30px #0006}
+.card h2{margin:0 0 4px;font-size:1.3rem}
+.tag{display:inline-block;background:var(--panel2);color:var(--accent);border-radius:999px;padding:2px 12px;font-size:.85rem;margin-bottom:6px}
+.story{color:var(--muted);margin:4px 0 12px}
+.q{background:var(--panel2);border-radius:12px;padding:12px 14px;margin:10px 0}
+.q b{color:var(--accent)}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+button{font-family:inherit;font-size:1rem;border:0;border-radius:10px;padding:9px 16px;cursor:pointer;font-weight:700;background:#2e3d6b;color:var(--ink);transition:transform .08s}
+button:active{transform:scale(.97)}
+button.primary{background:var(--accent);color:#2b2100}
+button.opt.sel{outline:3px solid var(--blue)}
+button:disabled{opacity:.45;cursor:not-allowed}
+input.num{font-family:inherit;font-size:1.2rem;width:110px;padding:8px 10px;border-radius:10px;border:2px solid #3a4a7a;background:#0f1730;color:var(--ink);text-align:center}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+.msg{min-height:1.6em;margin-top:8px;font-weight:700}
+.msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)}
+.hint{display:none;background:#2b2a17;border-right:4px solid var(--accent);border-radius:8px;padding:8px 12px;margin-top:8px;color:#ffe9a8}
+.hint.show{display:block}
+svg.board{width:100%;max-width:560px;display:block;margin:6px auto;background:#101a36;border-radius:14px;touch-action:manipulation;user-select:none}
+.stat{background:var(--panel2);border-radius:10px;padding:6px 12px;font-weight:700}
+.solved{display:none;text-align:center;background:#123b2c;border:2px solid var(--ok);border-radius:14px;padding:14px;margin-top:14px}
+.solved.show{display:block}
+.solved .big{font-size:2.4rem;font-weight:800;color:var(--accent)}
+.door-inputs{display:flex;gap:8px;justify-content:center;direction:ltr;margin:14px 0}
+.door-inputs input{width:48px;height:60px;font-size:1.8rem;text-align:center;border-radius:10px;border:2px solid #3a4a7a;background:#0f1730;color:var(--accent);font-weight:800;font-family:inherit}
+.final{text-align:center}
+.final .trophy{font-size:4rem}
+.final input.name{font-family:inherit;font-size:1.2rem;padding:8px 12px;border-radius:10px;border:2px solid var(--accent);background:#0f1730;color:var(--ink);width:min(320px,90%);text-align:center}
+.cert{border:3px double var(--accent);border-radius:16px;padding:16px;margin-top:12px;background:#151f3c}
+.cert .who{font-size:1.5rem;font-weight:800;color:var(--accent);min-height:1.5em}
+.learned{text-align:right;display:inline-block;margin:6px auto}
+.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);font-size:.85rem;margin:22px 0 8px}
+footer a{color:var(--muted)}
+.legend{font-size:.9rem;color:var(--muted)}
+.learn{background:#14284a;border:2px solid #2f5ea8;border-radius:14px;padding:12px 14px;margin:8px 0 12px}
+.learn h3{margin:0 0 6px;color:var(--blue)}
+.learn p{margin:4px 0}
+.em{color:var(--accent);font-size:1.08rem}
+.sumbox{text-align:center;background:var(--panel2);border-radius:10px;padding:8px;margin-top:8px;font-weight:700;font-size:1.05rem}
+.sumbox .eq{color:var(--accent)}
+details.try{margin-top:10px;background:#16213d;border-radius:10px;padding:8px 10px}
+details.try summary{cursor:pointer;font-weight:700;color:var(--blue)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>🔐 غرفة الهروب 2: مختبر الرسوم البيانية<small>المستوى المتقدم — ستة ألغاز جديدة</small></h1>
+    <div class="timer">⏱ <span id="time">00:00</span></div>
+  </header>
+
+  <div class="code-bar" id="codeBar"></div>
+
+  <!-- INTRO -->
+  <section class="card" id="intro">
+    <span class="tag">المهمة</span>
+    <h2>عدتنّ إلى المختبر… لكن الباب هذه المرة أصعب!</h2>
+    <p class="story">بعد أن هربتنّ من المختبر في المرة الأولى، غيّر العالِم القفل: صار يحتاج إلى <b>رمز من ستة أرقام</b>. كل محطة تحلّينها تكشف رقمًا واحدًا. الألغاز هنا تحتاج تفكيرًا أعمق، فلا تستعجلن، واستخدمن التلميح عند الحاجة.</p>
+    <div class="row"><button class="primary" id="startBtn">ابدأن المغامرة ▶</button></div>
+  </section>
+
+  <!-- STATION 1 -->
+  <section class="card hidden" data-st="0">
+    <span class="tag">المحطة 1 من 6</span>
+    <h2>👭 لغز الصديقات</h2>
+    <div class="learn">
+      <h3>📘 قبل اللغز: ما هي «الدرجة»؟</h3>
+      <p>في الرسم البياني: كل طالبة <b>نقطة</b> (تسمى <b>رأسًا</b>)، وكل صداقة <b>خط</b> بين طالبتين (يسمى <b>حافة</b>).<br>
+      <b class="em">درجة النقطة = عدد الخطوط الخارجة منها = عدد صديقات الطالبة.</b></p>
+      <p class="legend">👆 اضغطي على أي طالبة لتري درجتها:</p>
+      <svg class="board" id="degSvg" viewBox="0 0 440 300"></svg>
+      <div class="msg ok" id="degMsg" style="text-align:center">اضغطي على اسم طالبة…</div>
+      <div class="sumbox" id="degSum"></div>
+      <div class="row" style="justify-content:center"><button id="degCount">🔍 لماذا المجموع ضعف عدد الخطوط؟</button></div>
+      <div class="hint" id="degWhy">كل خط له <b>طرفان</b>. صداقة سارة وليلى تُحسب مرة عند سارة ومرة عند ليلى. لاحظي النقطتين الذهبيتين على طرفي كل خط: كل خط يُعدّ <b>مرتين</b>.<br>
+      لذلك دائمًا: <b>مجموع الدرجات = 2 × عدد الخطوط</b>، أي أن مجموع الدرجات <b>عدد زوجي دائمًا</b>.</div>
+    </div>
+    <div class="q">
+      <b>أ)</b> في صفٍّ فيه 7 طالبات، هل يمكن أن يكون لكل طالبة <b>3 صديقات بالضبط</b> داخل الصف؟ (الصداقة متبادلة)
+      <details class="try"><summary>🧪 جرّبي بنفسك: ارسمي الصداقات</summary>
+        <p class="legend">اضغطي طالبة ثم طالبة أخرى لرسم صداقة بينهما (واضغطي الخط مرة أخرى بنفس الطريقة لحذفه). حاولي أن تصل كل طالبة إلى 3 صديقات… هل تنجحين؟</p>
+        <svg class="board" id="trySvg" viewBox="0 0 440 340"></svg>
+        <div class="sumbox" id="trySum"></div>
+        <div class="row" style="justify-content:center"><button id="tryReset">↺ مسح</button></div>
+      </details>
+      <div class="opts" id="s1opts">
+        <button class="opt" data-v="yes">نعم، ممكن</button>
+        <button class="opt" data-v="no">لا، مستحيل</button>
+        <button class="opt" data-v="dep">يعتمد على من تصادق من</button>
+      </div>
+    </div>
+    <div class="q">
+      <b>ب)</b> في مجموعة أخرى فيها <b>6 طالبات</b> و<b>7 صداقات</b> (أي 7 خطوط). عدد صديقات خمس منهن: 3، 3، 2، 2، 1. كم صديقة للطالبة السادسة؟ (أي: ما درجتها؟)
+      <div class="row"><input class="num" id="s1num" type="number" inputmode="numeric"></div>
+    </div>
+    <div class="row"><button class="primary" id="s1check">تحقّقن</button><button data-hint="0">💡 تلميح</button></div>
+    <div class="msg" id="s1msg"></div>
+    <div class="hint" id="hint0">أ) اجمعي الدرجات: 7 × 3 = ؟ مجموع الدرجات يجب أن يكون زوجيًا (ضعف عدد الخطوط). هل هذا العدد زوجي؟<br>ب) 7 خطوط تعني أن مجموع الدرجات = 2 × 7 = 14. اطرحي منه مجموع الدرجات المعروفة.</div>
+  </section>
+
+  <!-- STATION 2 -->
+  <section class="card hidden" data-st="1">
+    <span class="tag">المحطة 2 من 6</span>
+    <h2>✏️ البيت ذو الطابقين (مسار أويلر)</h2>
+    <p class="story">ارسمن الشكل كله دون رفع القلم ودون المرور على أي خط مرتين. اضغطن نقطة البداية، ثم اضغطن النقاط بالترتيب. هذا الشكل أصعب من البيت السحري: ليس كل نقطة تصلح للبداية!</p>
+    <svg class="board" id="eulerSvg" viewBox="0 0 440 330"></svg>
+    <div class="row"><span class="stat">الخطوط المرسومة: <span id="eulerCount">0</span> من 11</span></div>
+    <div class="row"><button id="eulerReset">↺ من جديد</button><button id="eulerDeg">عدد الخطوط عند كل نقطة</button><button data-hint="1">💡 تلميح</button></div>
+    <div class="msg" id="eulerMsg"></div>
+    <div class="hint" id="hint1">عُدّي الخطوط عند كل نقطة. إذا كانت هناك نقطتان بالضبط عدد خطوطهما فردي، فيجب أن تبدئي من إحداهما وتنتهي عند الأخرى.</div>
+  </section>
+
+  <!-- STATION 3 -->
+  <section class="card hidden" data-st="2">
+    <span class="tag">المحطة 3 من 6</span>
+    <h2>🛡️ جولة الحارسة (دائرة هاملتون)</h2>
+    <p class="story">على الحارسة أن تزور <b>كل غرفة مرة واحدة فقط</b>، ثم تعود إلى الغرفة التي بدأت منها. لا يُشترط المرور على كل الممرات، ولكن لا يجوز زيارة غرفة مرتين. اضغطن غرفة البداية ثم تابعن عبر الممرات.</p>
+    <svg class="board" id="hamSvg" viewBox="0 0 440 340"></svg>
+    <div class="row"><span class="stat">الغرف التي زُرتنّها: <span id="hamCount">0</span> من 10</span></div>
+    <div class="row"><button id="hamUndo">↶ تراجع خطوة</button><button id="hamReset">↺ من جديد</button><button data-hint="2">💡 تلميح</button></div>
+    <div class="msg" id="hamMsg"></div>
+    <div class="hint" id="hint2">انتبهن للغرف التي لها ممران فقط: يجب استخدام كلا الممرين عندها (واحد للدخول وواحد للخروج). ابدأن من هذه الغرف وحدّدن الممرات الإجبارية أولًا.</div>
+  </section>
+
+  <!-- STATION 4 -->
+  <section class="card hidden" data-st="3">
+    <span class="tag">المحطة 4 من 6</span>
+    <h2>⚡ شبكة الكهرباء للقرى (الشجرة الممتدة الصغرى)</h2>
+    <p class="story">نريد إيصال الكهرباء إلى القرى السبع كلها بأقل كلفة. الأرقام على الطرق هي كلفة مدّ الخط (بآلاف الشواكل). اضغطن الطرق لاختيارها. يجب أن تصل الكهرباء إلى كل قرية، <b>بأقل كلفة ممكنة</b>.</p>
+    <svg class="board" id="mstSvg" viewBox="0 0 460 340"></svg>
+    <div class="row"><span class="stat">الكلفة: <span id="mstCost">0</span></span><span class="stat">عدد الخطوط: <span id="mstEdges">0</span></span></div>
+    <div class="row"><button class="primary" id="mstCheck">تحقّقن من الشبكة</button><button id="mstReset">↺ مسح</button><button data-hint="3">💡 تلميح</button></div>
+    <div class="msg" id="mstMsg"></div>
+    <div class="hint" id="hint3">ابدأن بأرخص طريق، ثم الذي يليه في الرخص، وهكذا… لكن تجاوزن أي طريق يصنع <b>حلقة مغلقة</b> (لأن القريتين متصلتان أصلًا). مع 7 قرى تحتاجن 6 خطوط بالضبط.</div>
+  </section>
+
+  <!-- STATION 5 -->
+  <section class="card hidden" data-st="4">
+    <span class="tag">المحطة 5 من 6</span>
+    <h2>🎨 خريطة الأحياء (التلوين)</h2>
+    <p class="story">حيّ السوق في الوسط يجاور كل الأحياء الخمسة حوله، وكل حيّ يجاور جاريه على الدائرة. لوّنّ الخريطة بحيث لا يتشارك حيّان متجاوران اللون نفسه. اضغطن الحيّ لتغيير لونه.</p>
+    <svg class="board" id="colSvg" viewBox="0 0 440 340"></svg>
+    <div class="q">بعد التلوين: <b>ما أقل عدد من الألوان</b> يكفي لهذه الخريطة؟
+      <div class="row"><input class="num" id="colNum" type="number" inputmode="numeric"><button class="primary" id="colCheck">تحقّقن</button></div>
+    </div>
+    <div class="row"><button id="colReset">↺ مسح الألوان</button><button data-hint="4">💡 تلميح</button></div>
+    <div class="msg" id="colMsg"></div>
+    <div class="hint" id="hint4">جرّبن تلوين الأحياء الخمسة الخارجية بلونين فقط بالتناوب… ماذا يحدث عند الحيّ الخامس؟ الدائرة فيها عدد <b>فردي</b> من الأحياء. ثم تذكّرن أن حيّ السوق يجاور الجميع.</div>
+  </section>
+
+  <!-- STATION 6 -->
+  <section class="card hidden" data-st="5">
+    <span class="tag">المحطة 6 من 6</span>
+    <h2>🏆 بطولة المدارس</h2>
+    <p class="story">كل مباراة يمكن تمثيلها بحافة بين فريقين. فكّرن قبل أن تعددن واحدة واحدة!</p>
+    <div class="q"><b>أ)</b> بطولة خروج المغلوب فيها <b>32 فريقًا</b>: الفريق الذي يخسر مرة واحدة يخرج. كم مباراة تُلعب حتى نعرف البطل؟
+      <div class="row"><input class="num" id="s6a" type="number" inputmode="numeric"></div></div>
+    <div class="q"><b>ب)</b> دوري فيه <b>6 فرق</b>، كل فريق يلعب مع كل فريق آخر <b>مرتين</b> (ذهابًا وإيابًا). كم مباراة في الدوري كله؟
+      <div class="row"><input class="num" id="s6b" type="number" inputmode="numeric"></div></div>
+    <div class="row"><button class="primary" id="s6check">تحقّقن</button><button data-hint="5">💡 تلميح</button></div>
+    <div class="msg" id="s6msg"></div>
+    <div class="hint" id="hint5">أ) كل مباراة تُخرج فريقًا واحدًا بالضبط. كم فريقًا يجب أن يخرج حتى يبقى فريق واحد؟<br>ب) تذكّرن المصافحات: كل فريق يلتقي 5 فرق، ونقسم على 2 لأن كل لقاء عُدّ مرتين… ثم المباريات مرتان.</div>
+  </section>
+
+  <!-- DOOR -->
+  <section class="card hidden" id="door">
+    <span class="tag">الباب</span>
+    <h2>🚪 افتحن الباب!</h2>
+    <p class="story">أدخلن الأرقام الستة بالترتيب كما ظهرت في المحطات.</p>
+    <div class="door-inputs" id="doorInputs"></div>
+    <div class="row" style="justify-content:center"><button class="primary" id="doorBtn">افتح</button></div>
+    <div class="msg" id="doorMsg" style="text-align:center"></div>
+  </section>
+
+  <!-- FINAL -->
+  <section class="card hidden final" id="final">
+    <div class="trophy">🎉</div>
+    <h2>هربتنّ من المختبر للمرة الثانية!</h2>
+    <p class="story">اكتبي اسمك (أو أسماء المجموعة)، ثم خذي لقطة شاشة لهذه الصفحة وسلّميها في Google Classroom.</p>
+    <input class="name" id="nameIn" placeholder="اكتبي اسمك هنا">
+    <div class="cert">
+      <div>شهادة إنجاز — المستوى المتقدم</div>
+      <div class="who" id="who"></div>
+      <div>الوقت: <b id="finalTime" style="direction:ltr;display:inline-block"></b> &nbsp;|&nbsp; التلميحات المستخدمة: <b id="hintsUsed"></b> &nbsp;|&nbsp; التاريخ: <b id="finalDate"></b></div>
+      <div style="margin-top:8px">الرمز هو بداية العدد <b>e</b> الشهير: <b style="direction:ltr;display:inline-block">2.71828…</b></div>
+      <div class="learned">
+        <b>ماذا تعلّمنا اليوم؟</b><br>
+        • درجة النقطة = عدد الخطوط الخارجة منها، ومجموع الدرجات = 2 × عدد الخطوط (لذلك هو زوجي دائمًا)<br>
+        • مسار أويلر: يمر على كل <b>حافة</b> مرة واحدة<br>
+        • دائرة هاملتون: تمر على كل <b>رأس</b> مرة واحدة وتعود للبداية<br>
+        • الشجرة الممتدة الصغرى: وصل كل الرؤوس بأقل كلفة، دون حلقات<br>
+        • التلوين: الدائرة الفردية تحتاج 3 ألوان، ومع رأس يجاور الجميع نحتاج 4<br>
+        • العدّ الذكي: خروج المغلوب ومباريات الدوري
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © جواد النشاشيبي — مجاني للاستخدام التعليمي، ويُمنع بيعه.
+    مرخّص بموجب <a href="https://creativecommons.org/licenses/by-nc/4.0/deed.ar" target="_blank" rel="noopener">CC BY-NC 4.0</a>
+  </footer>
+</div>
+
+<script>
+(function(){
+const CODE=[2,7,1,8,2,8];
+const NS="http://www.w3.org/2000/svg";
+let current=-1, solved=[false,false,false,false,false,false], hintsUsed=0, t0=null, timerId=null, elapsed=0;
+const $=id=>document.getElementById(id);
+const stations=[...document.querySelectorAll('[data-st]')];
+
+// code bar
+const bar=$('codeBar');
+CODE.forEach((_,i)=>{const s=document.createElement('div');s.className='slot';s.textContent='?';bar.appendChild(s);});
+function refreshBar(){[...bar.children].forEach((s,i)=>{s.className='slot'+(solved[i]?' got':'')+(i===current&&!solved[i]?' cur':'');s.textContent=solved[i]?CODE[i]:'?';});}
+refreshBar();
+
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+function startTimer(){t0=Date.now();timerId=setInterval(()=>{elapsed=Math.floor((Date.now()-t0)/1000);$('time').textContent=fmt(elapsed);},500);}
+
+function show(i){
+  $('intro').classList.add('hidden');
+  stations.forEach(s=>s.classList.add('hidden'));
+  $('door').classList.add('hidden');
+  current=i;
+  if(i<6) stations[i].classList.remove('hidden'); else $('door').classList.remove('hidden');
+  refreshBar(); window.scrollTo({top:0,behavior:'smooth'});
+}
+$('startBtn').onclick=()=>{startTimer();show(0);};
+
+function win(i){
+  if(solved[i]) return;
+  solved[i]=true; refreshBar();
+  const box=document.createElement('div');box.className='solved show';
+  box.innerHTML='<div>أحسنتنّ! الرقم المكشوف:</div><div class="big">'+CODE[i]+'</div>';
+  const b=document.createElement('button');b.className='primary';b.textContent=i<5?'المحطة التالية ◀':'إلى الباب 🚪';
+  b.onclick=()=>show(i+1);box.appendChild(b);
+  stations[i].appendChild(box);
+}
+function say(id,text,ok){const m=$(id);m.textContent=text;m.className='msg '+(ok?'ok':'bad');}
+
+document.querySelectorAll('[data-hint]').forEach(b=>b.onclick=()=>{const h=$('hint'+b.dataset.hint);if(!h.classList.contains('show')){h.classList.add('show');hintsUsed++;}});
+
+// SVG helpers
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function txt(parent,x,y,s,attrs){const t=el('text',Object.assign({x,y,'text-anchor':'middle','dominant-baseline':'central','font-family':'Tajawal, sans-serif'},attrs||{}),parent);t.textContent=s;return t;}
+function key(a,b){return a<b?a+'|'+b:b+'|'+a;}
+
+// ===== Station 1 =====
+// Example: degrees
+(function(){
+  const svg=$('degSvg');
+  const P={'سارة':[220,60],'ليلى':[80,170],'نور':[360,170],'ريم':[220,260]};
+  const E=[['سارة','ليلى'],['سارة','نور'],['سارة','ريم'],['ليلى','نور']];
+  const lines=E.map(([a,b])=>el('line',{x1:P[a][0],y1:P[a][1],x2:P[b][0],y2:P[b][1],stroke:'#6c7bb0','stroke-width':6,'stroke-linecap':'round'},svg));
+  const ends=[];
+  E.forEach(([a,b])=>{[a,b].forEach((n,j)=>{const o=j?a:b,dx=P[o][0]-P[n][0],dy=P[o][1]-P[n][1],L=Math.hypot(dx,dy);ends.push(el('circle',{cx:P[n][0]+dx/L*42,cy:P[n][1]+dy/L*42,r:7,fill:'#ffc94d',visibility:'hidden'},svg));});});
+  const deg={};E.forEach(([a,b])=>{deg[a]=(deg[a]||0)+1;deg[b]=(deg[b]||0)+1;});
+  const nodes={},badges={};
+  for(const n in P){
+    const g=el('g',{style:'cursor:pointer'},svg);
+    nodes[n]=el('circle',{cx:P[n][0],cy:P[n][1],r:32,fill:'#2e3d6b',stroke:'#5aa9ff','stroke-width':3},g);
+    txt(g,P[n][0],P[n][1],n,{fill:'#fff','font-size':16,'font-weight':800});
+    const bx=P[n][0]+30,by=P[n][1]-28;
+    badges[n]=el('g',{visibility:'hidden','pointer-events':'none'},svg);
+    el('circle',{cx:bx,cy:by,r:14,fill:'#ffc94d'},badges[n]);txt(badges[n],bx,by,deg[n],{fill:'#2b2100','font-size':16,'font-weight':800});
+    g.addEventListener('pointerdown',()=>{
+      E.forEach(([a,b],i)=>{const on=a===n||b===n;lines[i].setAttribute('stroke',on?'#3ddc97':'#6c7bb0');lines[i].setAttribute('stroke-width',on?9:6);});
+      for(const m in nodes)nodes[m].setAttribute('fill',m===n?'#1f7a57':'#2e3d6b');
+      badges[n].setAttribute('visibility','visible');
+      $('degMsg').textContent='درجة '+n+' = '+deg[n]+' (لها '+deg[n]+(deg[n]===1?' صديقة':' صديقات')+'، أي '+deg[n]+(deg[n]===1?' خط':' خطوط')+' خارجة منها)';
+      shown.add(n);sum();
+    });
+  }
+  const shown=new Set();
+  function sum(){
+    const names=Object.keys(P);
+    const parts=names.map(n=>shown.has(n)?deg[n]:'؟');
+    const done=shown.size===names.length;
+    $('degSum').innerHTML='مجموع الدرجات = '+parts.join(' + ')+(done?' = <span class="eq">8</span>':'')+' &nbsp;|&nbsp; عدد الخطوط = <span class="eq">4</span>'+(done?'<br>لاحظي: 8 = 2 × 4 🤔':'');
+  }
+  sum();
+  $('degCount').onclick=()=>{ends.forEach(c=>c.setAttribute('visibility','visible'));$('degWhy').classList.add('show');};
+})();
+// Sandbox: 7 girls, try degree 3 each
+(function(){
+  const svg=$('trySvg'),cx=220,cy=170,P=[],names=['هبة','دانة','مريم','جنى','لمى','تالا','رهف'];
+  for(let i=0;i<7;i++){const a=-Math.PI/2+i*2*Math.PI/7;P.push([cx+135*Math.cos(a),cy+135*Math.sin(a)]);}
+  const edgeLayer=el('g',{},svg),edges=new Map();let pick=null;const nodes=[],dl=[];
+  names.forEach((n,i)=>{
+    const g=el('g',{style:'cursor:pointer'},svg);
+    nodes.push(el('circle',{cx:P[i][0],cy:P[i][1],r:26,fill:'#2e3d6b',stroke:'#5aa9ff','stroke-width':3},g));
+    txt(g,P[i][0],P[i][1],n,{fill:'#fff','font-size':13,'font-weight':800});
+    const dx=P[i][0]-cx,dy=P[i][1]-cy,L=Math.hypot(dx,dy);
+    dl.push(txt(svg,P[i][0]+dx/L*42,P[i][1]+dy/L*42,'0',{fill:'#ffc94d','font-size':18,'font-weight':800}));
+    g.addEventListener('pointerdown',()=>tap(i));
+  });
+  function tap(i){
+    if(pick===null){pick=i;nodes[i].setAttribute('fill','#b8860b');return;}
+    if(pick!==i){const k=Math.min(pick,i)+'-'+Math.max(pick,i);
+      if(edges.has(k)){edges.get(k).remove();edges.delete(k);}
+      else edges.set(k,el('line',{x1:P[pick][0],y1:P[pick][1],x2:P[i][0],y2:P[i][1],stroke:'#3ddc97','stroke-width':5},edgeLayer));}
+    nodes[pick].setAttribute('fill','#2e3d6b');pick=null;upd();
+  }
+  function upd(){
+    const d=Array(7).fill(0);edges.forEach((_,k)=>{const [a,b]=k.split('-').map(Number);d[a]++;d[b]++;});
+    d.forEach((v,i)=>{dl[i].textContent=v;dl[i].setAttribute('fill',v===3?'#3ddc97':'#ffc94d');});
+    const s=d.reduce((a,b)=>a+b,0),three=d.filter(v=>v===3).length;
+    $('trySum').innerHTML='مجموع الدرجات = <span class="eq">'+s+'</span> &nbsp;|&nbsp; عدد الخطوط = <span class="eq">'+edges.size+'</span> &nbsp;|&nbsp; طالبات لديهن 3 صديقات: <span class="eq">'+three+' من 7</span>'+(three===6?'<br>اقتربتِ! لكن هل تستطيعين جعل السابعة 3 أيضًا؟ لو نجحتِ لكان المجموع 21… هل يمكن أن يكون 21 ضعفًا لعدد الخطوط؟':'');
+  }
+  $('tryReset').onclick=()=>{edges.forEach(l=>l.remove());edges.clear();if(pick!==null)nodes[pick].setAttribute('fill','#2e3d6b');pick=null;upd();};
+  upd();
+})();
+let s1choice=null;
+document.querySelectorAll('#s1opts .opt').forEach(b=>b.onclick=()=>{document.querySelectorAll('#s1opts .opt').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');s1choice=b.dataset.v;});
+$('s1check').onclick=()=>{
+  const n=parseInt($('s1num').value,10);
+  if(s1choice!=='no'){say('s1msg','الجزء (أ) غير صحيح بعد. اجمعي الدرجات وفكّري: هل المجموع زوجي؟',false);return;}
+  if(n!==3){say('s1msg','الجزء (أ) صحيح 👍 لكن راجعي الجزء (ب).',false);return;}
+  say('s1msg','ممتاز! 7×3=21 عدد فردي، ولا يمكن أن يكون ضعف عدد الحواف. و14−11=3.',true);win(0);
+};
+
+// ===== Station 2: Euler =====
+(function(){
+  const svg=$('eulerSvg');
+  const P={P1:[80,150],P2:[220,150],P3:[360,150],P4:[80,290],P5:[220,290],P6:[360,290],R:[220,40]};
+  const E=[['P1','P2'],['P2','P3'],['P4','P5'],['P5','P6'],['P1','P4'],['P2','P5'],['P3','P6'],['P1','P5'],['P2','P4'],['R','P1'],['R','P3']];
+  let used,path,lines={},nodes={},degShown=false,degLabels=[];
+  E.forEach(([a,b])=>{lines[key(a,b)]=el('line',{x1:P[a][0],y1:P[a][1],x2:P[b][0],y2:P[b][1],stroke:'#3c4a78','stroke-width':6,'stroke-linecap':'round','stroke-dasharray':'2 12'},svg);});
+  const deg={};E.forEach(([a,b])=>{deg[a]=(deg[a]||0)+1;deg[b]=(deg[b]||0)+1;});
+  for(const k in P){
+    const g=el('g',{style:'cursor:pointer'},svg);
+    el('circle',{cx:P[k][0],cy:P[k][1],r:24,fill:'transparent'},g);
+    nodes[k]=el('circle',{cx:P[k][0],cy:P[k][1],r:13,fill:'#5aa9ff',stroke:'#fff','stroke-width':2},g);
+    const t=txt(svg,P[k][0]+(k==='R'?28:0),P[k][1]+(k==='R'?0:-28),deg[k],{fill:'#ffc94d','font-size':18,'font-weight':800,visibility:'hidden'});degLabels.push(t);
+    g.addEventListener('pointerdown',()=>tap(k));
+  }
+  function reset(){used=new Set();path=[];for(const k in lines){lines[k].setAttribute('stroke','#3c4a78');lines[k].setAttribute('stroke-dasharray','2 12');}for(const k in nodes)nodes[k].setAttribute('fill','#5aa9ff');$('eulerCount').textContent=0;$('eulerMsg').textContent='';}
+  function tap(k){
+    if(solved[1])return;
+    if(!path.length){path.push(k);nodes[k].setAttribute('fill','#ffc94d');say('eulerMsg','بدأتِ من هنا. تابعي…',true);return;}
+    const last=path[path.length-1],kk=key(last,k);
+    if(!lines[kk]){say('eulerMsg','لا يوجد خط مباشر بين هاتين النقطتين.',false);return;}
+    if(used.has(kk)){say('eulerMsg','هذا الخط مرسوم من قبل! لا يجوز المرور مرتين.',false);return;}
+    used.add(kk);path.push(k);
+    lines[kk].setAttribute('stroke','#3ddc97');lines[kk].removeAttribute('stroke-dasharray');
+    for(const n in nodes)nodes[n].setAttribute('fill','#5aa9ff');nodes[k].setAttribute('fill','#ffc94d');
+    $('eulerCount').textContent=used.size;
+    if(used.size===E.length){say('eulerMsg','رائع! رسمتِ الشكل كله دون رفع القلم.',true);win(1);return;}
+    const stuck=!E.some(([a,b])=>(a===k||b===k)&&!used.has(key(a,b)));
+    if(stuck)say('eulerMsg','علقتِ! لا توجد خطوط متبقية من هذه النقطة. ابدئي من جديد.',false);else $('eulerMsg').textContent='';
+  }
+  $('eulerReset').onclick=reset;
+  $('eulerDeg').onclick=()=>{degShown=!degShown;degLabels.forEach(t=>t.setAttribute('visibility',degShown?'visible':'hidden'));};
+  reset();
+})();
+
+// ===== Station 3: Hamilton =====
+(function(){
+  const svg=$('hamSvg'),cx=220,cy=175,P={},names=[];
+  for(let i=0;i<5;i++){const a=-Math.PI/2+i*2*Math.PI/5;P['O'+i]=[cx+150*Math.cos(a),cy+150*Math.sin(a)];P['I'+i]=[cx+68*Math.cos(a),cy+68*Math.sin(a)];}
+  const E=[];
+  for(let i=0;i<5;i++){E.push(['O'+i,'O'+((i+1)%5)]);E.push(['I'+i,'I'+((i+1)%5)]);E.push(['O'+i,'I'+i]);}
+  const removed=[key('O0','O1'),key('O2','I2')];
+  const EE=E.filter(([a,b])=>!removed.includes(key(a,b)));
+  const adj={};for(const k in P)adj[k]=new Set();EE.forEach(([a,b])=>{adj[a].add(b);adj[b].add(a);});
+  const lines={},nodes={};
+  EE.forEach(([a,b])=>{lines[key(a,b)]=el('line',{x1:P[a][0],y1:P[a][1],x2:P[b][0],y2:P[b][1],stroke:'#3c4a78','stroke-width':7,'stroke-linecap':'round'},svg);});
+  const labels={O0:'1',O1:'2',O2:'3',O3:'4',O4:'5',I0:'6',I1:'7',I2:'8',I3:'9',I4:'10'};
+  for(const k in P){
+    const g=el('g',{style:'cursor:pointer'},svg);
+    nodes[k]=el('rect',{x:P[k][0]-18,y:P[k][1]-18,width:36,height:36,rx:8,fill:'#2e3d6b',stroke:'#5aa9ff','stroke-width':2},g);
+    txt(g,P[k][0],P[k][1],labels[k],{fill:'#fff','font-size':15,'font-weight':700});
+    g.addEventListener('pointerdown',()=>tap(k));
+  }
+  let path=[];
+  function draw(){
+    for(const k in lines)lines[k].setAttribute('stroke','#3c4a78');
+    for(const k in nodes)nodes[k].setAttribute('fill','#2e3d6b');
+    for(let i=1;i<path.length;i++)lines[key(path[i-1],path[i])].setAttribute('stroke','#3ddc97');
+    path.forEach((k,i)=>nodes[k].setAttribute('fill',i===0?'#b8860b':'#1f7a57'));
+    $('hamCount').textContent=new Set(path).size;
+  }
+  function tap(k){
+    if(solved[2])return;
+    if(!path.length){path.push(k);draw();say('hamMsg','بدأت الحارسة جولتها من هنا (باللون الذهبي).',true);return;}
+    const last=path[path.length-1];
+    if(!adj[last].has(k)){say('hamMsg','لا يوجد ممر مباشر بين هاتين الغرفتين.',false);return;}
+    if(k===path[0]&&path.length===10){path.push(k);draw();say('hamMsg','ممتاز! زارت الحارسة كل الغرف مرة واحدة وعادت إلى البداية.',true);win(2);return;}
+    if(path.includes(k)){say('hamMsg',k===path[0]?'لا يمكن العودة للبداية قبل زيارة كل الغرف.':'زرتِ هذه الغرفة من قبل!',false);return;}
+    path.push(k);draw();
+    if(path.length===10){ if(adj[k].has(path[0]))say('hamMsg','زرتِ كل الغرف! الآن عودي إلى غرفة البداية.',true); else say('hamMsg','زرتِ كل الغرف، لكن لا يوجد ممر للعودة إلى البداية. تراجعي وجرّبي طريقًا آخر.',false); return;}
+    const can=[...adj[k]].some(n=>!path.includes(n));
+    if(!can)say('hamMsg','طريق مسدود! تراجعي خطوة أو أكثر.',false);else $('hamMsg').textContent='';
+  }
+  $('hamUndo').onclick=()=>{if(solved[2])return;path.pop();draw();$('hamMsg').textContent='';};
+  $('hamReset').onclick=()=>{if(solved[2])return;path=[];draw();$('hamMsg').textContent='';};
+  draw();
+})();
+
+// ===== Station 4: MST =====
+(function(){
+  const svg=$('mstSvg');
+  const P={'أ':[60,90],'ب':[200,45],'ج':[150,200],'د':[300,150],'هـ':[270,290],'و':[410,240],'ز':[420,80]};
+  const E=[['أ','ب',4],['أ','ج',3],['ب','ج',2],['ب','د',5],['ج','د',7],['ج','هـ',6],['د','هـ',1],['د','و',4],['هـ','و',3],['د','ز',8],['و','ز',2],['ب','ز',9]];
+  const names=Object.keys(P);
+  // Kruskal for the minimum
+  function find(p,x){while(p[x]!==x)x=p[x]=p[p[x]];return x;}
+  let best=0;{const p={};names.forEach(n=>p[n]=n);[...E].sort((a,b)=>a[2]-b[2]).forEach(([a,b,w])=>{const ra=find(p,a),rb=find(p,b);if(ra!==rb){p[ra]=rb;best+=w;}});}
+  const sel=new Set(),vis=[];
+  E.forEach((e,i)=>{
+    const [a,b,w]=e,g=el('g',{style:'cursor:pointer'},svg);
+    const ln=el('line',{x1:P[a][0],y1:P[a][1],x2:P[b][0],y2:P[b][1],stroke:'#3c4a78','stroke-width':6,'stroke-linecap':'round'},g);
+    el('line',{x1:P[a][0],y1:P[a][1],x2:P[b][0],y2:P[b][1],stroke:'transparent','stroke-width':26},g);
+    const mx=(P[a][0]+P[b][0])/2,my=(P[a][1]+P[b][1])/2;
+    el('circle',{cx:mx,cy:my,r:13,fill:'#101a36',stroke:'#6c7bb0'},g);
+    txt(g,mx,my,w,{fill:'#ffc94d','font-size':15,'font-weight':800});
+    vis.push(ln);
+    g.addEventListener('pointerdown',()=>{if(solved[3])return;sel.has(i)?sel.delete(i):sel.add(i);upd();});
+  });
+  for(const n of names){el('circle',{cx:P[n][0],cy:P[n][1],r:20,fill:'#2e3d6b',stroke:'#5aa9ff','stroke-width':2},svg);txt(svg,P[n][0],P[n][1],n,{fill:'#fff','font-size':16,'font-weight':800,'pointer-events':'none'});}
+  function upd(){let c=0;vis.forEach((l,i)=>{const on=sel.has(i);l.setAttribute('stroke',on?'#ffc94d':'#3c4a78');l.setAttribute('stroke-width',on?9:6);if(on)c+=E[i][2];});$('mstCost').textContent=c;$('mstEdges').textContent=sel.size;$('mstMsg').textContent='';}
+  $('mstCheck').onclick=()=>{
+    const p={};names.forEach(n=>p[n]=n);let cyc=false,c=0;
+    sel.forEach(i=>{const [a,b,w]=E[i];c+=w;const ra=find(p,a),rb=find(p,b);if(ra===rb)cyc=true;else p[ra]=rb;});
+    const comps=new Set(names.map(n=>find(p,n))).size;
+    if(comps>1){say('mstMsg','بعض القرى لم تصلها الكهرباء بعد! كل القرى يجب أن تكون متصلة.',false);return;}
+    if(cyc){say('mstMsg','الشبكة متصلة، لكن فيها حلقة مغلقة: يوجد خط زائد يمكن حذفه لتوفير المال.',false);return;}
+    if(c>best){say('mstMsg','الشبكة متصلة وبلا حلقات، لكن الكلفة '+c+'. يوجد حل أرخص! جرّبي استبدال خط غالٍ بخط أرخص.',false);return;}
+    say('mstMsg','رائع! وصلت الكهرباء إلى كل القرى بأقل كلفة ممكنة: '+c+' ألف شيكل.',true);win(3);
+  };
+  $('mstReset').onclick=()=>{if(solved[3])return;sel.clear();upd();};
+})();
+
+// ===== Station 5: coloring =====
+(function(){
+  const svg=$('colSvg'),cx=220,cy=170,P={H:[cx,cy]},names=['السوق','الشمال','الشرق','الجنوب الشرقي','الجنوب الغربي','الغرب'];
+  const ids=['H','A','B','C','D','E'];
+  for(let i=0;i<5;i++){const a=-Math.PI/2+i*2*Math.PI/5;P[ids[i+1]]=[cx+135*Math.cos(a),cy+135*Math.sin(a)];}
+  const E=[];for(let i=1;i<=5;i++){E.push(['H',ids[i]]);E.push([ids[i],ids[i%5+1]]);}
+  const COLS=['#2e3d6b','#ff6b6b','#4dabf7','#ffd43b','#69db7c'];
+  const col={},lines={},nodes={};ids.forEach(k=>col[k]=0);
+  E.forEach(([a,b])=>{lines[key(a,b)]=el('line',{x1:P[a][0],y1:P[a][1],x2:P[b][0],y2:P[b][1],stroke:'#6c7bb0','stroke-width':4},svg);});
+  ids.forEach((k,i)=>{
+    const g=el('g',{style:'cursor:pointer'},svg);
+    nodes[k]=el('circle',{cx:P[k][0],cy:P[k][1],r:k==='H'?34:30,fill:COLS[0],stroke:'#fff','stroke-width':2},g);
+    txt(g,P[k][0],P[k][1],names[i],{fill:'#111','font-size':k==='H'?14:11,'font-weight':800});
+    g.addEventListener('pointerdown',()=>{if(solved[4])return;col[k]=(col[k]+1)%5;upd();});
+  });
+  function upd(){
+    let bad=0;
+    ids.forEach(k=>nodes[k].setAttribute('fill',COLS[col[k]]));
+    E.forEach(([a,b])=>{const c=col[a]&&col[a]===col[b];if(c)bad++;lines[key(a,b)].setAttribute('stroke',c?'#ff5c6c':'#6c7bb0');lines[key(a,b)].setAttribute('stroke-width',c?7:4);});
+    const all=ids.every(k=>col[k]);
+    if(bad)say('colMsg','يوجد حيّان متجاوران بنفس اللون (الخط الأحمر).',false);
+    else if(all)say('colMsg','التلوين صحيح ✔ الآن أجبن عن السؤال.',true);
+    else $('colMsg').textContent='';
+    return {bad,all};
+  }
+  $('colCheck').onclick=()=>{
+    const r=upd(),n=parseInt($('colNum').value,10);
+    if(!r.all||r.bad){say('colMsg','أكملن تلوين الخريطة تلوينًا صحيحًا أولًا.',false);return;}
+    if(n!==4){say('colMsg',n===3?'جرّبن بثلاثة ألوان فقط… هل تنجحن؟ انظرن إلى الدائرة الخارجية: عدد أحيائها فردي.':'ليس هذا الجواب. جرّبن تقليل عدد الألوان ولاحظن ما يحدث.',false);return;}
+    say('colMsg','صحيح! الدائرة الخارجية (5 أحياء) تحتاج 3 ألوان، وحيّ السوق يجاور الجميع فيحتاج لونًا رابعًا.',true);win(4);
+  };
+  $('colReset').onclick=()=>{if(solved[4])return;ids.forEach(k=>col[k]=0);upd();};
+  upd();
+})();
+
+// ===== Station 6 =====
+$('s6check').onclick=()=>{
+  const a=parseInt($('s6a').value,10),b=parseInt($('s6b').value,10);
+  if(a!==31){say('s6msg',a===16||a===32?'فكّري: كم فريقًا يجب أن يخسر حتى يبقى بطل واحد؟':'الجزء (أ) غير صحيح بعد.',false);return;}
+  if(b!==30){say('s6msg',b===15?'الجزء (أ) صحيح 👍 لكن تذكّري: كل فريقين يلتقيان مرتين!':'الجزء (أ) صحيح 👍 راجعي الجزء (ب).',false);return;}
+  say('s6msg','ممتاز! 31 فريقًا يخرجون = 31 مباراة. و(6×5÷2)×2 = 30.',true);win(5);
+};
+
+// ===== Door =====
+const di=$('doorInputs');
+for(let i=0;i<6;i++){const inp=document.createElement('input');inp.maxLength=1;inp.inputMode='numeric';inp.addEventListener('input',()=>{inp.value=inp.value.replace(/\D/g,'').slice(0,1);if(inp.value&&inp.nextElementSibling)inp.nextElementSibling.focus();});inp.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!inp.value&&inp.previousElementSibling)inp.previousElementSibling.focus();});di.appendChild(inp);}
+$('doorBtn').onclick=()=>{
+  const v=[...di.children].map(x=>x.value).join('');
+  if(v!==CODE.join('')){say('doorMsg','الرمز غير صحيح. راجعن الأرقام في الشريط العلوي.',false);return;}
+  clearInterval(timerId);
+  $('door').classList.add('hidden');$('final').classList.remove('hidden');
+  $('finalTime').textContent=fmt(elapsed);$('hintsUsed').textContent=hintsUsed;
+  $('finalDate').textContent=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+  window.scrollTo({top:0,behavior:'smooth'});
+};
+$('nameIn').addEventListener('input',e=>$('who').textContent=e.target.value);
+})();
+</script>
+</body>
+</html>
