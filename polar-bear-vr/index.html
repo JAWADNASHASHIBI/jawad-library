@@ -454,10 +454,13 @@ AFRAME.registerComponent('gaze-fill',{
   tick(){const t0=this.get();const p=t0===null?0:Math.min(1,(performance.now()-t0)/FUSE_MS);
     if(Math.abs(p-this.last)>0.005){this.last=p;this.el.setAttribute('theta-length',p*360);}}
 });
-function setupGaze(){
+let gazeReady=false;
+function setupGaze(force){
   const dev=AFRAME.utils.device;
-  const isPhone=dev.isMobile()&&!dev.isMobileVR();   // نظارة Quest تستخدم الزناد
-  if(!isPhone)return;
+  const isPhone=dev.isMobile()&&!dev.isMobileVR();
+  // الهاتف: دائمًا. نظارة Quest (أو أي نظارة): عند الدخول إلى الواقع الافتراضي، مع بقاء الزناد يعمل أيضًا
+  if(!isPhone&&!force)return;
+  if(gazeReady)return; gazeReady=true;
   const g=$('gaze'),fill=$('gazeFill');
   g.setAttribute('visible',true);
   g.setAttribute('raycaster','objects: .gaze; far: 20');
@@ -485,6 +488,7 @@ function boot(){
   $('nextBtn').addEventListener('click',nextScene);
   $('nextBtn').components['canvas-panel'].draw({text:'التالي ◂',textSize:70,center:true,bg:'rgba(20,90,140,0.92)'});
   setupGaze();
+  sceneEl.addEventListener('enter-vr',()=>setupGaze(true));
   [0,1,2].forEach(k=>$('qA'+k).addEventListener('click',()=>film.answer(k)));
   document.addEventListener('keydown',e=>{if((e.key==='ArrowLeft'||e.key===' ')&&film.state==='scene')film.go(film.i+1);});
   $('startBtn').addEventListener('click',()=>{
