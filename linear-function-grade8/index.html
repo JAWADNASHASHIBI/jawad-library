@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ورقة عمل: الدالة الخطية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@600;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a calm, encouraging math exam sheet for grade 8 girls
+   IDEA: a graph-paper worksheet that the teacher corrects in red pen
+   PICTURE: the worksheet itself, with hand-drawn-style graphs of y = mx and a plottable grid
+   COLOUR and TYPE: white graph paper, ink blue, red-pen accent; Reem Kufi titles, Tajawal body
+   LAYOUT: one column sheet, three parts, sticky-free score card at the end */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#0e1626);--grid:light-dark(#e3ebf7,#1a2740);--ink:light-dark(#14213d,#e6ecf7);
+--blue:light-dark(#1d3fb8,#8fb0ff);--soft:light-dark(#f2f6fd,#152038);--line:light-dark(#c9d6ee,#2a3a5c);
+--red:light-dark(#d7263d,#ff6b7d);--ok:light-dark(#11804a,#5fd69a);--mute:light-dark(#566079,#9aa6c0)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;color:var(--ink);font:17px/1.7 Tajawal,"Segoe UI",Tahoma,sans-serif;overflow-x:clip;
+background:var(--bg);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px}
+.sheet{max-width:860px;margin:0 auto;padding:clamp(18px,4vw,48px) max(4vw,14px) 40px}
+header{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:20px;align-items:center;border-bottom:3px solid var(--blue);padding-bottom:18px}
+h1{font:700 clamp(30px,6vw,46px)/1.15 "Reem Kufi",Tajawal,sans-serif;margin:0;color:var(--blue);text-wrap:balance}
+.sub{margin:6px 0 0;color:var(--mute)}
+.logo svg{width:100%;height:auto;display:block}
+.who{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}
+label.f{display:grid;gap:4px;font-size:14px;color:var(--mute)}
+input[type=text]{font:inherit;font-size:17px;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:9px 12px;min-height:44px;width:100%}
+input:focus-visible,button:focus-visible,textarea:focus-visible,.opt:focus-within{outline:3px solid var(--blue);outline-offset:2px}
+.goals{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font-size:16px}
+.goals ul{margin:4px 0 0;padding-inline-start:20px}
+h2{font:700 26px/1.3 "Reem Kufi",Tajawal,sans-serif;color:var(--blue);margin:40px 0 4px}
+.pdesc{margin:0 0 14px;color:var(--mute)}
+.q{background:var(--bg);border:1.5px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0;position:relative}
+.q.ok{border-color:var(--ok)}.q.bad{border-color:var(--red)}
+.qn{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--blue);color:var(--bg);font-weight:700;margin-inline-end:8px;font-size:15px}
+.qt{font-weight:500}
+.pts{float:inline-end;font-size:13px;color:var(--mute)}
+.m{direction:ltr;unicode-bidi:isolate;font-family:"Cambria Math","Times New Roman",serif;font-style:italic;white-space:nowrap}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{display:flex;gap:10px;align-items:center;border:1.5px solid var(--line);border-radius:10px;padding:10px 14px;min-height:44px;cursor:pointer}
+.opt input{width:20px;height:20px;accent-color:var(--blue);flex:none}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent)}
+.opt.wrong{border-color:var(--red);background:color-mix(in srgb,var(--red) 10%,transparent)}
+.fields{display:grid;gap:10px;margin-top:12px}
+.fld{display:grid;grid-template-columns:minmax(0,1fr) 130px;gap:12px;align-items:center}
+.fld input{text-align:center;direction:ltr}
+.fld.right input{border-color:var(--ok)}.fld.wrong input{border-color:var(--red)}
+.fld .corr{grid-column:1/-1;color:var(--red);font-size:14px;margin-top:-6px}
+.fig{margin:12px auto 4px;max-width:440px}
+.fig svg{width:100%;height:auto;display:block;direction:ltr}
+table.t{border-collapse:collapse;margin:12px 0;font-size:16px}
+.t td,.t th{border:1.5px solid var(--line);padding:6px 14px;text-align:center}
+.t th{background:var(--soft);font-weight:500}
+.ex{display:none;margin-top:12px;padding:10px 14px;border-inline-start:4px solid var(--red);background:color-mix(in srgb,var(--red) 7%,transparent);border-radius:6px;font-size:16px}
+.checked .ex{display:block}
+.q.ok .ex{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 8%,transparent)}
+.mark{position:absolute;top:10px;inset-inline-end:14px;font:700 28px "Reem Kufi",sans-serif;color:var(--red);transform:rotate(-8deg)}
+.q.ok .mark{color:var(--ok)}
+textarea{width:100%;min-height:110px;font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:12px}
+.plotbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px;font-size:15px;color:var(--mute)}
+#plot{cursor:crosshair;touch-action:manipulation}
+button{font:700 17px Tajawal,sans-serif;min-height:46px;padding:10px 22px;border-radius:10px;border:2px solid var(--blue);background:var(--blue);color:var(--bg);cursor:pointer}
+button.ghost{background:transparent;color:var(--blue)}
+button.small{min-height:40px;padding:6px 14px;font-size:15px}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin:30px 0 10px}
+#result{display:none;border:2.5px solid var(--red);border-radius:16px;padding:20px 22px;margin-top:20px;background:var(--bg)}
+#result.show{display:block}
+.big{font:700 clamp(40px,9vw,64px)/1 "Reem Kufi",sans-serif;color:var(--red)}
+.rows{display:grid;gap:10px;margin:16px 0}
+.row{display:grid;grid-template-columns:150px minmax(0,1fr) 64px;gap:10px;align-items:center;font-size:15px}
+.bar{height:12px;background:var(--soft);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--blue);border-radius:6px;transition:width .6s}
+.row b{text-align:left;direction:ltr;white-space:nowrap}
+footer{margin-top:40px;padding-top:14px;border-top:1.5px solid var(--line);font-size:14px;color:var(--mute);text-align:center}
+@media(max-width:600px){header{grid-template-columns:minmax(0,1fr) 90px}.who{grid-template-columns:minmax(0,1fr)}.fld{grid-template-columns:minmax(0,1fr) 100px}.row{grid-template-columns:100px minmax(0,1fr) 54px}.q{padding:16px 14px}}
+@media(prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<main class="sheet">
+<header>
+  <div>
+    <h1>ورقة عمل: الدالة الخطية والنسبة الطردية</h1>
+    <p class="sub">الصف الثامن · الفصل 2: التمثيل البياني للدالة التي تمثّل نسبة طردية</p>
+  </div>
+  <div class="logo" aria-hidden="true">
+    <svg viewBox="0 0 150 120"><g stroke="var(--line)" stroke-width="1">
+      <path d="M20 10V100M45 10V100M70 10V100M95 10V100M120 10V100M20 100H140M20 75H140M20 50H140M20 25H140"/></g>
+      <path d="M20 100H142M20 100V6" stroke="var(--ink)" stroke-width="2" fill="none"/>
+      <path d="M20 100L140 40" stroke="var(--blue)" stroke-width="3"/><path d="M20 100L80 10" stroke="var(--red)" stroke-width="3"/>
+      <circle cx="20" cy="100" r="5" fill="var(--ink)"/></svg>
+  </div>
+</header>
+
+<div class="who">
+  <label class="f">اسم الطالبة<input type="text" id="sname" autocomplete="name"></label>
+  <label class="f">الصف والشعبة<input type="text" id="sclass" placeholder="مثلاً: ثامن أ"></label>
+  <label class="f">التاريخ<input type="text" id="sdate"></label>
+</div>
+
+<div class="goals">
+  <strong>ماذا تقيس هذه الورقة؟</strong>
+  <ul>
+    <li>الجزء أ: فهم معنى النسبة الطردية والتمثيل الجبري <span class="m">y = mx</span>.</li>
+    <li>الجزء ب: مهارات قراءة الجداول والخطوط البيانية ورسمها.</li>
+    <li>الجزء ج: حلّ مسائل ومشكلات من الحياة اليومية.</li>
+  </ul>
+  <div style="margin-top:6px">اكتبي الأعداد العشرية بالنقطة أو الفاصلة (مثل 7.5)، ويمكنك كتابة الكسر هكذا: 1/2. اضغطي «صحّحي ورقتي» في النهاية.</div>
+</div>
+
+<div id="paper"></div>
+
+<div class="actions">
+  <button id="check">صحّحي ورقتي</button>
+  <button id="reset" class="ghost">ابدئي من جديد</button>
+</div>
+
+<section id="result" aria-live="polite">
+  <div id="rname" style="font-weight:700"></div>
+  <div class="big" id="rscore"></div>
+  <div id="rmsg"></div>
+  <div class="rows" id="rrows"></div>
+  <button id="copy" class="ghost small">نسخ النتيجة لإرسالها للمعلم</button>
+  <span id="copied" style="margin-inline-start:10px;color:var(--ok)"></span>
+</section>
+
+<footer>© جواد النشاشيبي — مجانية للاستخدام التعليمي، ويُمنع بيعها أو استخدامها تجاريًا (CC BY-NC 4.0)<br>الأسئلة من إعداد المعلم، مبنيّة على مفاهيم الفصل 2 من كتاب الرياضيات للصف الثامن.</footer>
+</main>
+
+<script>
+{
+const M=s=>`<span class="m">${s}</span>`;
+
+/* graph: fixed viewBox, labels in clear space */
+function graph(o){
+  const W=380,H=270,L=48,R=20,T=24,B=40;
+  const px=x=>L+x/o.xmax*(W-L-R), py=y=>H-B-y/o.ymax*(H-B-T);
+  let g='';
+  for(let x=o.xs;x<=o.xmax+1e-9;x+=o.xs) g+=`<line x1="${px(x)}" y1="${py(0)}" x2="${px(x)}" y2="${py(o.ymax)}" stroke="var(--line)"/>`;
+  for(let y=o.ys;y<=o.ymax+1e-9;y+=o.ys) g+=`<line x1="${px(0)}" y1="${py(y)}" x2="${px(o.xmax)}" y2="${py(y)}" stroke="var(--line)"/>`;
+  for(let x=o.xl;x<=o.xmax+1e-9;x+=o.xl) g+=`<text x="${px(x)}" y="${py(0)+18}" font-size="12" text-anchor="middle" fill="var(--ink)">${+x.toFixed(2)}</text>`;
+  for(let y=o.yl;y<=o.ymax+1e-9;y+=o.yl) g+=`<text x="${px(0)-7}" y="${py(y)+4}" font-size="12" text-anchor="end" fill="var(--ink)">${+y.toFixed(2)}</text>`;
+  g+=`<text x="${px(0)-7}" y="${py(0)+18}" font-size="12" text-anchor="end" fill="var(--ink)">0</text>`;
+  g+=`<path d="M${px(0)} ${py(0)}H${px(o.xmax)+12}M${px(0)} ${py(0)}V${py(o.ymax)-14}" stroke="var(--ink)" stroke-width="1.8" fill="none"/>`;
+  g+=`<text x="${px(o.xmax)+14}" y="${py(0)+4}" font-size="13" font-style="italic" fill="var(--ink)">x</text>`;
+  g+=`<text x="${px(0)+6}" y="${py(o.ymax)-8}" font-size="13" font-style="italic" fill="var(--ink)">y</text>`;
+  if(o.ylab) g+=`<text x="${px(0)+20}" y="${T-6}" font-size="12" fill="var(--mute)" text-anchor="start">${o.ylab}</text>`;
+  if(o.xlab) g+=`<text x="${px(o.xmax)}" y="${H-4}" font-size="12" fill="var(--mute)" text-anchor="end">${o.xlab}</text>`;
+  if(o.m!=null){const xe=Math.min(o.xmax,o.ymax/o.m);g+=`<line x1="${px(0)}" y1="${py(0)}" x2="${px(xe)}" y2="${py(o.m*xe)}" stroke="var(--blue)" stroke-width="3"/>`}
+  (o.pts||[]).forEach(p=>{g+=`<circle cx="${px(p[0])}" cy="${py(p[1])}" r="5" fill="var(--red)"/>`});
+  return `<svg viewBox="0 0 ${W} ${H}" ${o.id?`id="${o.id}"`:''} role="img" aria-label="${o.aria||'رسم بياني'}">${g}<g class="layer"></g></svg>`;
+}
+const PLOT={xmax:8,ymax:12,xs:1,ys:1,xl:1,yl:2,id:'plot',aria:'شبكة لتعيين النقاط'};
+
+const parts=[
+ {name:'الجزء أ: فهم المفاهيم',short:'فهم المفاهيم',desc:'اختاري الإجابة الصحيحة في كل سؤال.',items:[
+  {k:'mc',t:'العلاقة بين مقدارين موجبين تُسمّى <strong>نسبة طردية</strong> إذا تحقّق ما يلي:',
+   o:['كلما زاد أحد المقدارين زاد الآخر بأي طريقة','إذا ضربنا أحد المقدارين بعدد ما، ضُرب الثاني بنفس العدد','إذا أضفنا عددًا لأحد المقدارين، أُضيف نفس العدد للآخر','كلما زاد أحد المقدارين نقص الآخر'],a:1,
+   e:'النسبة الطردية تعني أن الضرب في عدد يحدث للمقدارين معًا، فتبقى النسبة بينهما ثابتة. مجرّد «يزيد مع الزيادة» لا يكفي.'},
+  {k:'mc',t:'أيّ دالة من الدوال التالية تصف نسبة طردية؟',o:[M('y = x + 4'),M('y = 4x'),M('y = 4x − 1'),M('y = 4 / x')],a:1,
+   e:`النسبة الطردية تُكتب على الصورة ${M('y = mx')}، وهنا ${M('m = 4')}.`},
+  {k:'mc',t:'الخط البياني لدالة تمثّل نسبة طردية يمرّ دائمًا بالنقطة:',o:[M('(1 , 1)'),M('(0 , m)'),M('(0 , 0)'),M('(m , 0)')],a:2,
+   e:`عندما ${M('x = 0')} نحصل على ${M('y = m · 0 = 0')}، لذلك يمرّ الخط دائمًا بنقطة أصل المحاور.`},
+  {k:'mc',t:`في المعادلة ${M('y = mx')} يمثّل العدد ${M('m')}:`,o:[`قيمة ${M('y')} عندما ${M('x = 0')}`,`النسبة الثابتة ${M('y / x')} بين المقدارين`,`أكبر قيمة يمكن أن يأخذها ${M('x')}`,`الفرق الثابت ${M('y − x')}`],a:1,
+   e:`من ${M('y / x = m')} نرى أن ${M('m')} هو العدد الثابت الذي يساوي النسبة بين ${M('y')} و ${M('x')}.`},
+  {k:'mc',t:'أيّ جدول يمثّل نسبة طردية؟',o:[
+   `${M('x')}: 2، 4، 6 &nbsp;|&nbsp; ${M('y')}: 5، 7، 9`,`${M('x')}: 2، 4، 6 &nbsp;|&nbsp; ${M('y')}: 3، 6، 9`,
+   `${M('x')}: 1، 2، 3 &nbsp;|&nbsp; ${M('y')}: 6، 3، 2`,`${M('x')}: 1، 3، 5 &nbsp;|&nbsp; ${M('y')}: 2، 4، 6`],a:1,
+   e:'في الجدول الثاني: 3/2 = 6/4 = 9/6 = 1.5، النسبة ثابتة. في الجداول الأخرى النسبة تتغيّر.'},
+  {k:'mc',t:`إذا كانت ${M('f(x) = 3x')}، فإن ${M('f(4)')} تساوي:`,o:['7','12','34',M('4/3')],a:1,
+   e:`${M('f(4)')} هي قيمة الدالة عندما ${M('x = 4')}: ${M('3 · 4 = 12')}. الإشارة ${M('f(x)')} لها نفس معنى ${M('y')}.`},
+  {k:'mc',t:`هل يمكن أن يكون ${M('m = 0')} في التمثيل ${M('y = mx')} لوصف نسبة طردية؟`,o:[
+   'نعم، لأن أي عدد يصلح أن يكون m','لا، لأن y يصبح 0 دائمًا، ولا تبقى علاقة بين مقدارين موجبين','نعم، لأن الخط سيمرّ بأصل المحاور','لا، لأن m يجب أن يكون عددًا صحيحًا'],a:1,
+   e:`عندما ${M('m = 0')} تكون ${M('y = 0')} لكل قيمة ${M('x')}، فلا يتغيّر y بضرب x بعدد. النسبة الطردية علاقة بين مقدارين موجبين، فلا يصلح ${M('m = 0')}. (ويمكن أن يكون m كسرًا مثل 1/2).`}
+ ]},
+ {name:'الجزء ب: المهارات',short:'المهارات',desc:'احسبي واكتبي الإجابة في المربّع.',items:[
+  {k:'num',t:`أكملي الجدول حسب الدالة ${M('y = 2.5x')}:`,
+   fig:`<table class="t"><tr><th>${M('x')}</th><td>2</td><td>4</td><td>10</td><td>؟</td></tr><tr><th>${M('y')}</th><td>؟</td><td>؟</td><td>؟</td><td>20</td></tr></table>`,
+   f:[[`قيمة ${M('y')} عندما ${M('x = 2')}`,5],[`قيمة ${M('y')} عندما ${M('x = 4')}`,10],[`قيمة ${M('y')} عندما ${M('x = 10')}`,25],[`قيمة ${M('x')} عندما ${M('y = 20')}`,8]],
+   e:`نضرب x في 2.5: ${M('2.5·2=5')}، ${M('2.5·4=10')}، ${M('2.5·10=25')}. وللعكس نقسم: ${M('20 ÷ 2.5 = 8')}.`},
+  {k:'num',t:'يصف الخط البياني عدد الصفحات التي تطبعها طابعة المدرسة كدالة للزمن. النقطتان الحمراوان على الخط.',
+   fig:graph({xmax:10,ymax:120,xs:1,ys:10,xl:2,yl:20,m:12,pts:[[2,24],[8,96]],ylab:'عدد الصفحات',xlab:'الزمن (دقائق)',aria:'خط يمر بالنقطتين (2,24) و(8,96)'}),
+   f:[['كم صفحة تطبع الطابعة في دقيقة واحدة؟ (قيمة m)',12],['كم صفحة تُطبع خلال 5 دقائق؟',60],['بعد كم دقيقة تُطبع 90 صفحة؟',7.5],['كم صفحة تُطبع خلال 15 دقيقة؟ (خارج الرسم)',180]],
+   e:`من النقطة (2 , 24): ${M('m = 24 ÷ 2 = 12')}، إذن ${M('y = 12x')}. خلال 5 دقائق: 60 صفحة. ${M('90 ÷ 12 = 7.5')} دقيقة. خلال 15 دقيقة: ${M('12·15 = 180')}.`},
+  {k:'num',t:`النقطة ${M('(4 , 10)')} تقع على خط بياني لدالة تمثّل نسبة طردية.`,
+   f:[[`ما قيمة ${M('m')}؟`,2.5],[`ما قيمة ${M('y')} عندما ${M('x = 12')}؟`,30],[`ما قيمة ${M('x')} عندما ${M('y = 45')}؟`,18]],
+   e:`${M('m = 10 ÷ 4 = 2.5')}، إذن ${M('y = 2.5x')}. ${M('2.5·12 = 30')}، و ${M('45 ÷ 2.5 = 18')}.`},
+  {k:'plot',pts:2,t:`عيّني على الشبكة <strong>ثلاث نقاط مختلفة</strong> تقع على الخط البياني للدالة ${M('y = 1.5x')}. اضغطي على تقاطع خطوط الشبكة لتعيين نقطة، واضغطي عليها مرة أخرى لحذفها.`,
+   e:`النقاط ذات الإحداثيات الصحيحة على الخط ${M('y = 1.5x')} في هذه الشبكة هي: ${M('(0,0)')}، ${M('(2,3)')}، ${M('(4,6)')}، ${M('(6,9)')}، ${M('(8,12)')}. لاحظي أن الخط يمرّ بأصل المحاور.`}
+ ]},
+ {name:'الجزء ج: حلّ المسائل والمشكلات',short:'حلّ المشكلات',desc:'اقرئي المسألة جيدًا، فكّري، ثم أجيبي.',items:[
+  {k:'num',t:'سعر كيلوغرام واحد من الجبنة في البقالة 48 شاقلًا. السعر (y بالشواقل) يتعلّق بالوزن (x بالكيلوغرام).',
+   f:[[`اكتبي قيمة ${M('m')} في الدالة ${M('y = mx')}`,48],['كم ثمن 2.5 كغم من الجبنة؟ (بالشواقل)',120],['كم كيلوغرامًا يمكن شراؤها بـ 180 شاقلًا؟',3.75]],
+   e:`${M('y = 48x')}. ${M('48·2.5 = 120')} شاقلًا. ${M('180 ÷ 48 = 3.75')} كغم.`},
+  {k:'num',t:`تعرض شركتا هاتف نقّال عرضًا: «ادفع مقابل الدقائق فقط». سعر شركة <strong>أ</strong> يُوصف بالدالة ${M('y = 0.4x')}، وسعر شركة <strong>ب</strong> يُوصف بالخط البياني التالي (x = دقائق، y = السعر بالشواقل).`,
+   fig:graph({xmax:30,ymax:15,xs:5,ys:1,xl:5,yl:3,m:0.5,pts:[[10,5],[20,10]],ylab:'السعر (شاقل)',xlab:'الدقائق',aria:'خط شركة ب يمر بالنقطتين (10,5) و(20,10)'}),
+   f:[['ما سعر الدقيقة الواحدة في شركة ب؟',0.5],['كم تدفع منى لشركة أ مقابل 30 دقيقة؟',12],['كم تدفع منى لشركة ب مقابل 30 دقيقة؟',15],['كم شاقلًا توفّر منى إذا اختارت الشركة الأرخص لمكالمات مدّتها 30 دقيقة؟',3]],
+   e:`شركة ب: ${M('5 ÷ 10 = 0.5')}، أي ${M('y = 0.5x')}. لـ 30 دقيقة: أ ← ${M('0.4·30 = 12')}، ب ← ${M('0.5·30 = 15')}. التوفير: ${M('15 − 12 = 3')} شواقل. شركة أ أرخص لأن m فيها أصغر.`},
+  {k:'mc',t:`نظرت سلمى إلى الجدول: ${M('x')}: 2، 4، 6 و ${M('y')}: 5، 7، 9، وقالت: «هذه نسبة طردية لأنه كلما زاد x زاد y». هل سلمى على حق؟`,
+   o:['نعم، لأن y يزداد عندما يزداد x','نعم، لأن y يزداد كل مرة بـ 2','لا، لأن النسبة y/x ليست ثابتة: 5/2 ≠ 7/4','لا، لأن قيم y أكبر من قيم x'],a:2,
+   e:'عندما ضربنا x في 2 (من 2 إلى 4) لم يُضرب y في 2 (من 5 إلى 7 وليس 10). النسبة غير ثابتة، والزيادة وحدها لا تكفي.'},
+  {k:'num',t:'يُملأ حوض أسماك بالماء بقدرة ثابتة: 8 لترات في الدقيقة. كان الحوض فارغًا في البداية، وسعته 120 لترًا.',
+   f:[[`اكتبي قيمة ${M('m')} في الدالة التي تصف كمية الماء (لتر) كدالة للزمن (دقيقة)`,8],['كم لترًا يكون في الحوض بعد 6.5 دقيقة؟',52],['بعد كم دقيقة يمتلئ الحوض؟',15]],
+   e:`${M('y = 8x')}. ${M('8·6.5 = 52')} لترًا. ${M('120 ÷ 8 = 15')} دقيقة.`},
+  {k:'open',t:'في مسألة حوض الأسماك: ما معنى النقطة (0 , 0) على الخط البياني؟ ولماذا يمرّ الخط بها؟ اشرحي بكلماتك.',
+   e:'<strong>إجابة نموذجية للمقارنة:</strong> النقطة (0 , 0) تعني أنه عند بداية الملء (بعد 0 دقائق) كان في الحوض 0 لتر، أي أنه كان فارغًا. يمرّ الخط بها لأن العلاقة نسبة طردية y = 8x، وعندما x = 0 فإن y = 0. <em>هذا السؤال يصحّحه المعلم.</em>'}
+ ]}
+];
+
+/* render */
+let n=0;const paper=document.getElementById('paper');
+paper.innerHTML=parts.map((p,pi)=>`<h2>${p.name}</h2><p class="pdesc">${p.desc}</p>`+p.items.map((q,qi)=>{
+  n++;q.id='q'+n;q.part=pi;q.max=q.k==='mc'?1:q.k==='num'?q.f.length:q.k==='plot'?q.pts:0;
+  let body='';
+  if(q.k==='mc') body=`<div class="opts">${q.o.map((o,i)=>`<label class="opt"><input type="radio" name="${q.id}" value="${i}"><span>${o}</span></label>`).join('')}</div>`;
+  if(q.k==='num') body=(q.fig?`<div class="fig">${q.fig}</div>`:'')+`<div class="fields">${q.f.map((f,i)=>`<div class="fld" id="${q.id}f${i}"><label for="${q.id}_${i}">${f[0]}</label><input type="text" inputmode="decimal" id="${q.id}_${i}" autocomplete="off"></div>`).join('')}</div>`;
+  if(q.k==='plot') body=`<div class="fig">${graph(PLOT)}</div><div class="plotbar"><span id="plotinfo">النقاط المعيّنة: لا يوجد</span><button type="button" class="ghost small" id="plotclear">مسح النقاط</button></div>`;
+  if(q.k==='open') body=`<textarea id="${q.id}_t" aria-label="إجابتك"></textarea>`;
+  return `<div class="q" id="${q.id}"><span class="mark"></span><span class="pts">${q.max?q.max+(q.max===1?' علامة':' علامات'):'يصحّحه المعلم'}</span><span class="qn">${n}</span><span class="qt">${q.t}</span>${body}<div class="ex">${q.e}</div></div>`;
+}).join('')).join('');
+
+/* plot interaction */
+const svg=document.getElementById('plot'),layer=svg.querySelector('.layer');let pts=[];
+const W=380,H=270,L=48,R=20,T=24,B=40;
+const px=x=>L+x/PLOT.xmax*(W-L-R),py=y=>H-B-y/PLOT.ymax*(H-B-T);
+function drawPts(){
+  layer.innerHTML=pts.map(p=>`<circle cx="${px(p[0])}" cy="${py(p[1])}" r="7" fill="var(--blue)" stroke="var(--bg)" stroke-width="2"/>`).join('');
+  document.getElementById('plotinfo').textContent='النقاط المعيّنة: '+(pts.length?pts.map(p=>`(${p[0]} , ${p[1]})`).join('  '):'لا يوجد');
+}
+svg.addEventListener('click',ev=>{
+  if(document.getElementById(PQ.id).classList.contains('checked'))return;
+  const pt=svg.createSVGPoint();pt.x=ev.clientX;pt.y=ev.clientY;const c=pt.matrixTransform(svg.getScreenCTM().inverse());
+  const x=Math.round((c.x-L)/(W-L-R)*PLOT.xmax),y=Math.round((H-B-c.y)/(H-B-T)*PLOT.ymax);
+  if(x<0||y<0||x>PLOT.xmax||y>PLOT.ymax)return;
+  const i=pts.findIndex(p=>p[0]===x&&p[1]===y);
+  if(i>=0)pts.splice(i,1);else if(pts.length<3)pts.push([x,y]);
+  drawPts();
+});
+document.getElementById('plotclear').addEventListener('click',()=>{pts=[];drawPts()});
+const all=parts.flatMap(p=>p.items),PQ=all.find(q=>q.k==='plot');
+
+/* checking */
+function num(s){
+  s=(s||'').trim().replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[٫,]/g,'.').replace(/\s/g,'');
+  if(/^-?\d+(\.\d+)?\/\d+(\.\d+)?$/.test(s)){const[a,b]=s.split('/');return a/b}
+  return s===''?NaN:Number(s);
+}
+let last=null;
+function check(){
+  const per=parts.map(()=>({got:0,max:0}));
+  all.forEach(q=>{
+    const el=document.getElementById(q.id);let got=0;
+    if(q.k==='mc'){
+      const sel=el.querySelector('input:checked');const v=sel?+sel.value:-1;
+      el.querySelectorAll('.opt').forEach((o,i)=>{o.classList.toggle('right',i===q.a);o.classList.toggle('wrong',i===v&&v!==q.a)});
+      got=v===q.a?1:0;
+    }
+    if(q.k==='num'){
+      q.f.forEach((f,i)=>{const box=document.getElementById(q.id+'f'+i);const v=num(document.getElementById(q.id+'_'+i).value);const ok=Math.abs(v-f[1])<1e-6;
+        box.classList.toggle('right',ok);box.classList.toggle('wrong',!ok);box.querySelector('.corr')?.remove();
+        if(!ok)box.insertAdjacentHTML('beforeend',`<div class="corr">الإجابة الصحيحة: <span class="m">${f[1]}</span></div>`);
+        if(ok)got++});
+    }
+    if(q.k==='plot'){
+      const good=pts.filter(p=>Math.abs(p[1]-1.5*p[0])<1e-9).length,bad=pts.length-good;
+      got=good===3?2:good===2?1:0;
+      layer.insertAdjacentHTML('afterbegin',`<line x1="${px(0)}" y1="${py(0)}" x2="${px(8)}" y2="${py(12)}" stroke="var(--ok)" stroke-width="2.5" stroke-dasharray="6 5"/>`);
+      layer.querySelectorAll('circle').forEach((c,i)=>c.setAttribute('fill',Math.abs(pts[i][1]-1.5*pts[i][0])<1e-9?'var(--ok)':'var(--red)'));
+    }
+    el.classList.add('checked');
+    if(q.max){el.classList.toggle('ok',got===q.max);el.classList.toggle('bad',got<q.max);el.querySelector('.mark').textContent=`${got}/${q.max}`;
+      per[q.part].got+=got;per[q.part].max+=q.max}
+    el.querySelectorAll('input,textarea').forEach(i=>{if(i.type!=='text'||i.closest('.q'))i.disabled=q.k!=='open'});
+  });
+  const got=per.reduce((a,b)=>a+b.got,0),max=per.reduce((a,b)=>a+b.max,0),pct=Math.round(got/max*100);
+  const name=document.getElementById('sname').value.trim();
+  document.getElementById('rname').textContent=name?`نتيجة ${name}`:'نتيجتك';
+  document.getElementById('rscore').textContent=`${got} / ${max}`;
+  document.getElementById('rmsg').textContent=pct>=90?'ممتاز! فهمتِ النسبة الطردية والدالة y = mx فهمًا عميقًا.':pct>=70?'جيد جدًا! راجعي الأسئلة المعلّمة بالأحمر واقرئي الشرح تحتها.':pct>=50?'بداية جيدة. راجعي معنى m وكيف نحسبه من نقطة على الخط، ثم حاولي من جديد.':'لا بأس، راجعي الصفحات 75–79 في الكتاب واقرئي الشرح تحت كل سؤال، ثم حاولي مرة أخرى.';
+  document.getElementById('rrows').innerHTML=per.map((p,i)=>`<div class="row"><span>${parts[i].short}</span><div class="bar"><i style="width:0"></i></div><b>${p.got}/${p.max}</b></div>`).join('');
+  requestAnimationFrame(()=>document.querySelectorAll('#rrows .bar i').forEach((b,i)=>b.style.width=(per[i].got/per[i].max*100)+'%'));
+  const r=document.getElementById('result');r.classList.add('show');r.scrollIntoView({behavior:'smooth',block:'start'});
+  document.getElementById('check').disabled=true;
+  last={name,cls:document.getElementById('sclass').value.trim(),got,max,pct,per};
+}
+document.getElementById('check').addEventListener('click',check);
+document.getElementById('reset').addEventListener('click',()=>{
+  document.querySelectorAll('.q').forEach(q=>{q.classList.remove('checked','ok','bad');q.querySelector('.mark').textContent=''});
+  document.querySelectorAll('.opt').forEach(o=>o.classList.remove('right','wrong'));
+  document.querySelectorAll('.fld').forEach(f=>{f.classList.remove('right','wrong');f.querySelector('.corr')?.remove()});
+  document.querySelectorAll('.q input,.q textarea').forEach(i=>{i.disabled=false;if(i.type==='radio')i.checked=false;else i.value=''});
+  pts=[];drawPts();document.getElementById('result').classList.remove('show');document.getElementById('check').disabled=false;
+  window.scrollTo({top:0,behavior:'smooth'});
+});
+document.getElementById('copy').addEventListener('click',async()=>{
+  if(!last)return;
+  const t=`ورقة عمل الدالة الخطية – الصف الثامن\nالاسم: ${last.name||'—'}\nالصف: ${last.cls||'—'}\nالعلامة: ${last.got}/${last.max} (${last.pct}%)\n`+last.per.map((p,i)=>`${parts[i].short}: ${p.got}/${p.max}`).join('\n')+`\nإجابة السؤال المفتوح: ${document.querySelector('.q textarea').value.trim()||'—'}`;
+  const msg=document.getElementById('copied');
+  try{await navigator.clipboard.writeText(t);msg.textContent='تم النسخ ✓'}catch(e){msg.textContent='لم يتم النسخ، انسخي النتيجة يدويًا'}
+});
+const d=new Date();document.getElementById('sdate').value=`${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+}
+</script>
+</body>
+</html>
