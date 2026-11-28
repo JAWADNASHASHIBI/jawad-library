@@ -64,6 +64,22 @@ textarea{width:100%;min-height:140px;font:inherit;font-size:16px;padding:12px;bo
 .final .btn{background:var(--lime);border-color:var(--lime);color:#14200a}
 .final .btn.g{background:transparent;color:var(--paper);border-color:var(--paper)}
 #msg{min-height:1.6em;font-weight:700}
+#report{display:none}
+@media print{
+  body{background:#fff;color:#000;font-size:12pt}
+  body>*:not(#report){display:none!important}
+  #report{display:block;padding:0 6mm}
+  #report h1{font:600 20pt Fredoka,sans-serif;margin:0 0 4px}
+  #report .rm{display:grid;grid-template-columns:1fr 1fr;gap:2px 20px;margin:8px 0 12px;font-size:11pt}
+  #report .big{font:600 26pt Fredoka,sans-serif}
+  #report h3{font:600 13pt Fredoka,sans-serif;margin:14px 0 4px;border-bottom:2px solid #7cb82f;padding-bottom:2px;break-after:avoid}
+  #report ol{margin:0;padding-left:1.5em}#report li{padding:3px 0;border:0;line-height:1.45;break-inside:avoid}
+  #report .y{color:#1e7a2c;font-weight:800}#report .x{color:#c0392b;font-weight:800}
+  #report .u{text-decoration:underline;font-weight:700}
+  #report .note{color:#555;font-size:10pt}
+  #report .wr{white-space:pre-wrap;border:1px solid #999;border-radius:6px;padding:8px;min-height:60px}
+  #report .ft{margin-top:16px;text-align:center;color:#555;font:10pt Tajawal,sans-serif}
+}
 footer{text-align:center;color:var(--soft);font:500 14px/1.7 Tajawal,Nunito,sans-serif;padding:10px 16px 36px}
 @media(max-width:600px){.top .in{grid-template-columns:1fr}.ring{width:96px;height:96px}.ring b{font-size:22px}li{line-height:2}}
 @media(prefers-reduced-motion:no-preference){.ring{transition:--p .6s}section.pop{animation:pop .5s}@keyframes pop{50%{transform:scale(1.015)}}}
@@ -88,15 +104,17 @@ footer{text-align:center;color:var(--soft);font:500 14px/1.7 Tajawal,Nunito,sans
   </section>
   <section class="final">
     <h2>Finished?</h2>
-    <p>Check every part, then copy your results and send them to your teacher on Google Classroom.</p>
+    <p>Press <b>Save as PDF</b>, choose “Save as PDF”, then attach the file to the assignment in Google Classroom (Add or create → File).</p>
     <div class="bar" style="justify-content:center">
-      <button class="btn" id="all">Check everything</button>
+      <button class="btn" id="pdf">Save as PDF for Classroom</button>
+      <button class="btn g" id="all">Check everything</button>
       <button class="btn g" id="copy">Copy my results</button>
       <button class="btn g" id="reset">Start again</button>
     </div>
     <p id="msg"></p>
   </section>
 </main>
+<div id="report"></div>
 <footer>© جواد النشاشيبي — مجاني للاستخدام التعليمي، غير مخصص للبيع · CC BY-NC 4.0</footer>
 <script>
 {
@@ -146,7 +164,7 @@ const S=[
 ['Hurry up! The bus ___.',['comes','is coming'],1]]}];
 
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
-const norm=s=>s.toLowerCase().replace(/[’‘`]/g,"'").replace(/\s+/g,' ').trim();
+const norm=s=>s.toLowerCase().replace(/['’‘`]/g,'').replace(/\s+/g,' ').trim();
 const blank=(sec,i,j,cls='')=>`<input class="b ${cls}" id="${sec}${i}_${j}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="answer">`;
 function item(s,q,i){
   const parts=q[0].split('___');
@@ -163,7 +181,33 @@ $('#main').innerHTML=S.map(s=>`<section id="s${s.id}"><div class="hd"><span clas
 $('#tabs').innerHTML=S.map(s=>`<a href="#s${s.id}" id="t${s.id}">${s.id} · ${esc(s.t.split(':')[0])}</a>`).join('')+'<a href="#write">G · Your turn</a>';
 $('#max').textContent=S.reduce((a,s)=>a+s.q.length,0);
 
-const score={};
+const score={},shown={};
+function given(s,q,i){
+  if(s.k==='sel'){const e=$('#'+s.id+i+'_0');return e.value===''?'':q[1][+e.value]}
+  if(s.k==='ch'){const on=$('#'+s.id+i+'_0').querySelector('.on');return on?on.textContent:''}
+  if(s.k==='in')return $('#'+s.id+i+'_0').value.trim();
+  return [$('#'+s.id+i+'_0').value.trim(),$('#'+s.id+i+'_1').value.trim()];
+}
+function isOk(s,q,i,g){
+  if(s.k==='sel'||s.k==='ch')return g===q[1][q[2]];
+  if(s.k==='in')return q[1].map(norm).includes(norm(g));
+  return q[1].includes(norm(g[0]))&&q[2].includes(norm(g[1]));
+}
+function buildReport(){
+  const name=$('#nm').value.trim(),d=new Date();
+  const fill=(text,vals)=>{let k=0;return esc(text).replace(/___/g,()=>{const v=vals[k++];return `<span class="u">${v?esc(v):'_____'}</span>`})};
+  const secs=S.map(s=>{
+    const items=s.q.map((q,i)=>{const g=given(s,q,i),ok=isOk(s,q,i,g),vals=Array.isArray(g)?g:[g];
+      const right=s.k==='in2'?q[1][0]+' … '+q[2][0]:s.k==='in'?q[1][0]:q[1][q[2]];
+      return `<li>${fill(q[0],vals)} ${ok?'<span class="y">✓</span>':`<span class="x">✗</span> <span class="note">correct: ${esc(right)}</span>`}</li>`}).join('');
+    return `<h3>${s.id}. ${esc(s.t)} — ${score[s.id]} / ${s.q.length}${shown[s.id]?' <span class="note">(answers were shown)</span>':''}</h3><ol>${items}</ol>`}).join('');
+  $('#report').innerHTML=`<h1>Unit 1 Grammar Practice — Results</h1>
+  <div class="rm"><div>Student: <b>${esc(name)}</b></div><div>Class: Grade 8A</div>
+  <div>Teacher: Jamila Badriyeh</div><div>Date: ${esc(d.toLocaleString('en-GB',{dateStyle:'medium',timeStyle:'short'}))}</div></div>
+  <div>Total score: <span class="big">${$('#tot').textContent} / ${$('#max').textContent}</span></div>
+  ${secs}<h3>G. Your turn — At the beach</h3><div class="wr">${esc($('#txt').value.trim()||'(empty)')}</div>
+  <div class="ft">© جواد النشاشيبي — مجاني للاستخدام التعليمي، غير مخصص للبيع · CC BY-NC 4.0</div>`;
+}
 function check(id){
   const s=S.find(x=>x.id===id);let n=0;
   s.q.forEach((q,i)=>{let ok;
@@ -187,7 +231,7 @@ document.addEventListener('click',e=>{
   const c=e.target.closest('.ch button');
   if(c){c.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('on','ok','no'));c.classList.add('on');return}
   const k=e.target.dataset.check;if(k){check(k);return}
-  const sh=e.target.dataset.show;if(sh){const sec=$('#s'+sh);sec.classList.toggle('reveal');e.target.textContent=sec.classList.contains('reveal')?'Hide answers':'Show answers'}
+  const sh=e.target.dataset.show;if(sh){const sec=$('#s'+sh);sec.classList.toggle('reveal');shown[sh]=true;e.target.textContent=sec.classList.contains('reveal')?'Hide answers':'Show answers'}
 });
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('input.b')){const sec=e.target.closest('section');check(sec.id.slice(1))}});
 $('#all').onclick=()=>{S.forEach(s=>check(s.id));$('#msg').textContent=`Your score: ${$('#tot').textContent} / ${$('#max').textContent}`};
@@ -195,7 +239,13 @@ $('#reset').onclick=()=>{document.querySelectorAll('input.b,select').forEach(e=>
   document.querySelectorAll('.ch button').forEach(b=>b.classList.remove('on','ok','no'));
   document.querySelectorAll('section').forEach(s=>s.classList.remove('reveal'));document.querySelectorAll('[data-show]').forEach(b=>b.textContent='Show answers');
   document.querySelectorAll('.sc').forEach(s=>s.textContent='');document.querySelectorAll('.tabs a').forEach(a=>a.classList.remove('done'));
-  for(const k in score)delete score[k];$('#txt').value='';$('#msg').textContent='';total()};
+  for(const k in score)delete score[k];for(const k in shown)delete shown[k];$('#txt').value='';$('#msg').textContent='';total()};
+$('#pdf').onclick=()=>{
+  if(!$('#nm').value.trim()){$('#msg').textContent='Please write your name at the top first.';$('#nm').focus();window.scrollTo({top:0});return}
+  S.forEach(s=>check(s.id));buildReport();
+  $('#msg').textContent='Choose “Save as PDF”, then attach the file in Google Classroom.';
+  try{window.print()}catch(err){$('#msg').textContent='Saving is not available here. Open the worksheet from its GitHub link.'}
+};
 $('#copy').onclick=async()=>{
   S.forEach(s=>check(s.id));
   const name=$('#nm').value.trim()||'(no name)';
