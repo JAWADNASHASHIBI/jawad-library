@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grade 8A Grammar Worksheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;800&family=Tajawal:wght@500&display=swap" rel="stylesheet">
+<style>
+/*
+VOICE: friendly, clear workbook for 13-year-olds; encouraging, never noisy.
+IDEA: the class workbook page itself — lime tabs, star levels, ruled answer lines.
+PICTURE: the working exercises are the picture, opened under a lime header band with a live score ring.
+COLOUR and TYPE: white paper, lime #7cb82f dominant, deep green ink, coral for mistakes; Fredoka titles + Nunito body.
+LAYOUT: one calm column up to 860px, section tabs row, sticky score bar on wide screens.
+*/
+:root{color-scheme:light dark;
+--bg:light-dark(#f4f8ec,#10170b);--paper:light-dark(#fff,#18220f);--ink:light-dark(#1d2b12,#e9f2dc);
+--soft:light-dark(#5b6b4c,#a9b99a);--lime:#7cb82f;--limeS:light-dark(#e8f3d6,#26361a);--line:light-dark(#d5e0c6,#33442a);
+--ok:light-dark(#2f8a3a,#7fd88a);--okS:light-dark(#e3f5e5,#173a1d);--bad:light-dark(#d8463a,#ff8a7d);--badS:light-dark(#fde8e5,#3d1a16)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 Nunito,system-ui,sans-serif;overflow-x:clip}
+h1,h2{font-family:Fredoka,Nunito,sans-serif;line-height:1.1;margin:0;text-wrap:balance}
+.top{background:var(--lime);color:#14200a;padding:clamp(22px,4vw,44px) max(5vw,16px) 26px}
+.top .in{max-width:860px;margin:auto;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center}
+.top h1{font-size:clamp(30px,5vw,46px)}
+.meta{margin:8px 0 14px;font-weight:600}
+.name{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.name input{font:inherit;font-size:16px;padding:10px 14px;border-radius:12px;border:2px solid #14200a;background:#fff;color:#14200a;width:min(320px,100%)}
+.ring{width:118px;height:118px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(#14200a var(--p,0%),rgba(20,32,10,.18) 0);position:relative}
+.ring::before{content:"";position:absolute;inset:11px;border-radius:50%;background:var(--lime)}
+.ring b{position:relative;font:600 26px Fredoka;text-align:center;line-height:1}.ring small{display:block;font:600 12px Nunito}
+.tabs{position:sticky;top:0;z-index:5;background:var(--paper);border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto;padding:8px max(5vw,16px)}
+.tabs a{flex:none;text-decoration:none;color:var(--ink);font-weight:800;font-size:14px;padding:8px 14px;border-radius:99px;background:var(--limeS)}
+.tabs a.done{background:var(--lime);color:#14200a}
+main{max-width:860px;margin:auto;padding:24px max(4vw,12px) 40px}
+section{background:var(--paper);border-radius:20px;padding:clamp(18px,3vw,30px);margin-bottom:22px;border:1px solid var(--line);scroll-margin-top:64px}
+.hd{display:flex;gap:12px;align-items:center;margin-bottom:6px}
+.tag{flex:none;width:42px;height:42px;border-radius:50% 50% 50% 8px;background:var(--lime);color:#14200a;display:grid;place-items:center;font:600 20px Fredoka}
+.stars{color:var(--lime);font-size:14px;letter-spacing:2px}
+h2{font-size:24px}
+.ins{color:var(--soft);margin:0 0 14px}
+ol{margin:0;padding-left:1.6em}
+li{padding:10px 0;border-bottom:1px dashed var(--line)}li:last-child{border:0}
+input.b,select{font:inherit;font-size:16px;color:var(--ink);background:transparent;border:0;border-bottom:2px solid var(--soft);padding:4px 6px;min-height:40px;width:9.5em;max-width:100%;border-radius:6px 6px 0 0}
+input.b.s{width:5.5em}
+select{width:auto;cursor:pointer}
+input.b:focus,select:focus,button:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+.ok{background:var(--okS)!important;border-color:var(--ok)!important}
+.no{background:var(--badS)!important;border-color:var(--bad)!important}
+.ch{display:inline-flex;gap:6px;flex-wrap:wrap;vertical-align:middle}
+.ch button{font:inherit;font-size:16px;font-weight:600;min-height:40px;padding:4px 12px;border-radius:12px;border:2px solid var(--line);background:var(--paper);color:var(--ink);cursor:pointer}
+.ch button.on{border-color:var(--ink)}
+.ans{display:none;color:var(--ok);font-weight:800;font-size:15px;margin-left:6px}
+.reveal .ans{display:inline}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:16px}
+.btn{font:800 16px Nunito;min-height:44px;padding:8px 18px;border-radius:14px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer}
+.btn.g{background:transparent;color:var(--ink)}
+.sc{font-weight:800}
+textarea{width:100%;min-height:140px;font:inherit;font-size:16px;padding:12px;border-radius:14px;border:2px solid var(--line);background:var(--paper);color:var(--ink);background-image:repeating-linear-gradient(transparent 0 33px,var(--line) 33px 34px);line-height:34px}
+.final{background:var(--ink);color:var(--paper);text-align:center}
+.final h2{font-size:30px}.final p{margin:8px 0 16px}
+.final .btn{background:var(--lime);border-color:var(--lime);color:#14200a}
+.final .btn.g{background:transparent;color:var(--paper);border-color:var(--paper)}
+#msg{min-height:1.6em;font-weight:700}
+footer{text-align:center;color:var(--soft);font:500 14px/1.7 Tajawal,Nunito,sans-serif;padding:10px 16px 36px}
+@media(max-width:600px){.top .in{grid-template-columns:1fr}.ring{width:96px;height:96px}.ring b{font-size:22px}li{line-height:2}}
+@media(prefers-reduced-motion:no-preference){.ring{transition:--p .6s}section.pop{animation:pop .5s}@keyframes pop{50%{transform:scale(1.015)}}}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+  <div>
+    <h1>Unit 1 Grammar Practice</h1>
+    <p class="meta">English · Grade 8A · Teacher: Jamila Badriyeh</p>
+    <div class="name"><label for="nm">My name:</label><input id="nm" placeholder="Write your full name" autocomplete="name"></div>
+  </div>
+  <div class="ring" id="ring"><b><span id="tot">0</span><small>of <span id="max">0</span></small></b></div>
+</div></header>
+<nav class="tabs" id="tabs"></nav>
+<main id="main"></main>
+<main style="padding-top:0">
+  <section id="write">
+    <div class="hd"><span class="tag">G</span><div><span class="stars">★★★</span><h2>Your turn</h2></div></div>
+    <p class="ins">Imagine you are at the beach. Write at least three sentences about what people are doing. Use the Present Progressive.</p>
+    <textarea id="txt" placeholder="A boy is swimming in the sea…"></textarea>
+  </section>
+  <section class="final">
+    <h2>Finished?</h2>
+    <p>Check every part, then copy your results and send them to your teacher on Google Classroom.</p>
+    <div class="bar" style="justify-content:center">
+      <button class="btn" id="all">Check everything</button>
+      <button class="btn g" id="copy">Copy my results</button>
+      <button class="btn g" id="reset">Start again</button>
+    </div>
+    <p id="msg"></p>
+  </section>
+</main>
+<footer>© جواد النشاشيبي — مجاني للاستخدام التعليمي، غير مخصص للبيع · CC BY-NC 4.0</footer>
+<script>
+{
+const S=[
+{id:'A',st:'★★',t:'Word forms',ins:'Choose the correct word: verb or noun.',k:'sel',q:[
+['Excuse me, can you ___ me to the train station?',['direct','directions'],0],
+['The teacher gave us clear ___ for the test.',['direct','directions'],1],
+['Good ___ between friends is very important.',['communicate','communication'],1],
+['Dolphins ___ with each other using sounds.',['communicate','communication'],0],
+['My brother ___ old coins from different countries.',['collects','collection'],0],
+['The library has a big ___ of English stories.',['collects','collection'],1],
+['This app helps you ___ your lost phone.',['locate','location'],0],
+['The new school is in a great ___ near the park.',['locate','location'],1]]},
+{id:'B',st:'★',t:'Present Simple: positive or negative',ins:'Tap the correct answer.',k:'ch',q:[
+['Sara is a vegetarian. She ___ meat.',['eats',"doesn't eat"],1],
+['Omar loves football. He ___ every afternoon.',['plays',"doesn't play"],0],
+['My little sister is afraid of the dark. She ___ with the light off.',['sleeps',"doesn't sleep"],1],
+['The shop is open all night. It ___ at 6:00.',['closes',"doesn't close"],1],
+['We live near the school, so we ___ to school.',['walk',"don't walk"],0],
+['Lina hates cold weather. She ___ winter.',['likes',"doesn't like"],1]]},
+{id:'C',st:'★',t:'Present Simple: write the verb',ins:'Write the positive or negative form of the verb in brackets.',k:'in',q:[
+['Ahmad ___ (study) English every day. He wants to speak it well.',['studies']],
+['My parents ___ (watch) TV at night. They prefer to read books.',["don't watch",'do not watch']],
+['The school bus ___ (leave) at 7:30 every morning.',['leaves']],
+['Maya ___ (drink) coffee. She only drinks tea.',["doesn't drink",'does not drink']],
+['Our teacher always ___ (give) us interesting activities.',['gives']],
+['The baby ___ (cry) when he is hungry.',['cries']]]},
+{id:'D',st:'★★',t:'Present Simple: questions',ins:'Complete the questions with do / does and the verb.',k:'in2',q:[
+['___ you ___ (have) English lessons on Sunday?',['do'],['have']],
+['___ your brother ___ (play) the guitar?',['does'],['play']],
+['Where ___ your friends ___ (meet) after school?',['do'],['meet']],
+['What time ___ the movie ___ (start)?',['does'],['start']],
+['___ your math teacher ___ (speak) Arabic?',['does'],['speak']]]},
+{id:'E',st:'★',t:'Present Progressive',ins:'Write the verb in the Present Progressive, positive or negative.',k:'in',q:[
+['Look! The children ___ (play) in the garden.',['are playing']],
+['Be quiet! The baby ___ (sleep).',['is sleeping']],
+["I ___ (not / watch) TV right now. I'm doing my homework.",['am not watching',"'m not watching"]],
+['Lian ___ (fly) to London next Monday.',['is flying']],
+['We ___ (meet) our cousins this evening.',['are meeting']],
+['It ___ (not / rain) at the moment.',["isn't raining",'is not raining',"'s not raining"]]]},
+{id:'F',st:'★★',t:'Simple or Progressive?',ins:'Tap the correct answer. Remember: stative verbs (know, like, want, understand, taste) are not usually in the progressive.',k:'ch',q:[
+['Tamer ___ the answer to the question.',['knows','is knowing'],0],
+['Listen! Someone ___ in the next room.',['sings','is singing'],1],
+['I ___ this word. Can you help me?',["don't understand","am not understanding"],0],
+['She usually ___ to school with her friends.',['walks','is walking'],0],
+['Mmm! This soup ___ delicious.',['tastes','is tasting'],0],
+['Hurry up! The bus ___.',['comes','is coming'],1]]}];
+
+const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+const norm=s=>s.toLowerCase().replace(/[’‘`]/g,"'").replace(/\s+/g,' ').trim();
+const blank=(sec,i,j,cls='')=>`<input class="b ${cls}" id="${sec}${i}_${j}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="answer">`;
+function item(s,q,i){
+  const parts=q[0].split('___');
+  if(s.k==='sel'){const o=q[1].map((w,n)=>`<option value="${n}">${esc(w)}</option>`).join('');
+    return parts[0]+`<select id="${s.id}${i}_0"><option value="">choose…</option>${o}</select>`+parts[1]+`<span class="ans">${esc(q[1][q[2]])}</span>`}
+  if(s.k==='ch'){const b=q[1].map((w,n)=>`<button type="button" data-n="${n}">${esc(w)}</button>`).join('');
+    return parts[0]+`<span class="ch" id="${s.id}${i}_0">${b}</span>`+parts[1]+`<span class="ans">${esc(q[1][q[2]])}</span>`}
+  if(s.k==='in')return parts[0]+blank(s.id,i,0)+parts[1]+`<span class="ans">${esc(q[1][0])}</span>`;
+  return parts[0]+blank(s.id,i,0,'s')+parts[1]+blank(s.id,i,1)+parts[2]+`<span class="ans">${esc(q[1][0]+' … '+q[2][0])}</span>`;
+}
+$('#main').innerHTML=S.map(s=>`<section id="s${s.id}"><div class="hd"><span class="tag">${s.id}</span><div><span class="stars">${s.st}</span><h2>${esc(s.t)}</h2></div></div>
+<p class="ins">${esc(s.ins)}</p><ol>${s.q.map((q,i)=>`<li>${item(s,q,i)}</li>`).join('')}</ol>
+<div class="bar"><button class="btn" data-check="${s.id}">Check</button><button class="btn g" data-show="${s.id}">Show answers</button><span class="sc" id="sc${s.id}"></span></div></section>`).join('');
+$('#tabs').innerHTML=S.map(s=>`<a href="#s${s.id}" id="t${s.id}">${s.id} · ${esc(s.t.split(':')[0])}</a>`).join('')+'<a href="#write">G · Your turn</a>';
+$('#max').textContent=S.reduce((a,s)=>a+s.q.length,0);
+
+const score={};
+function check(id){
+  const s=S.find(x=>x.id===id);let n=0;
+  s.q.forEach((q,i)=>{let ok;
+    if(s.k==='sel'){const e=$('#'+id+i+'_0');ok=e.value!==''&&+e.value===q[2];mark(e,e.value===''?null:ok)}
+    else if(s.k==='ch'){const e=$('#'+id+i+'_0'),on=e.querySelector('.on');ok=on&&+on.dataset.n===q[2];
+      e.querySelectorAll('button').forEach(b=>b.classList.remove('ok','no'));if(on)on.classList.add(ok?'ok':'no')}
+    else if(s.k==='in'){const e=$('#'+id+i+'_0');ok=q[1].map(norm).includes(norm(e.value));mark(e,e.value.trim()?ok:null)}
+    else{const a=$('#'+id+i+'_0'),b=$('#'+id+i+'_1');const o1=q[1].includes(norm(a.value)),o2=q[2].includes(norm(b.value));
+      mark(a,a.value.trim()?o1:null);mark(b,b.value.trim()?o2:null);ok=o1&&o2}
+    if(ok)n++});
+  score[id]=n;$('#sc'+id).textContent=`${n} / ${s.q.length}`+(n===s.q.length?' — Excellent!':'');
+  $('#t'+id).classList.toggle('done',n===s.q.length);
+  const sec=$('#s'+id);sec.classList.remove('pop');void sec.offsetWidth;if(n===s.q.length)sec.classList.add('pop');
+  total();
+}
+function mark(e,ok){e.classList.remove('ok','no');if(ok!==null)e.classList.add(ok?'ok':'no')}
+function total(){const t=Object.values(score).reduce((a,b)=>a+b,0),m=+$('#max').textContent;
+  $('#tot').textContent=t;$('#ring').style.setProperty('--p',(t/m*100)+'%')}
+
+document.addEventListener('click',e=>{
+  const c=e.target.closest('.ch button');
+  if(c){c.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('on','ok','no'));c.classList.add('on');return}
+  const k=e.target.dataset.check;if(k){check(k);return}
+  const sh=e.target.dataset.show;if(sh){const sec=$('#s'+sh);sec.classList.toggle('reveal');e.target.textContent=sec.classList.contains('reveal')?'Hide answers':'Show answers'}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.matches('input.b')){const sec=e.target.closest('section');check(sec.id.slice(1))}});
+$('#all').onclick=()=>{S.forEach(s=>check(s.id));$('#msg').textContent=`Your score: ${$('#tot').textContent} / ${$('#max').textContent}`};
+$('#reset').onclick=()=>{document.querySelectorAll('input.b,select').forEach(e=>{e.value='';e.classList.remove('ok','no')});
+  document.querySelectorAll('.ch button').forEach(b=>b.classList.remove('on','ok','no'));
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('reveal'));document.querySelectorAll('[data-show]').forEach(b=>b.textContent='Show answers');
+  document.querySelectorAll('.sc').forEach(s=>s.textContent='');document.querySelectorAll('.tabs a').forEach(a=>a.classList.remove('done'));
+  for(const k in score)delete score[k];$('#txt').value='';$('#msg').textContent='';total()};
+$('#copy').onclick=async()=>{
+  S.forEach(s=>check(s.id));
+  const name=$('#nm').value.trim()||'(no name)';
+  const lines=[`Grade 8A — Unit 1 Grammar Practice`,`Student: ${name}`,`Total: ${$('#tot').textContent} / ${$('#max').textContent}`,
+    ...S.map(s=>`${s.id}. ${s.t}: ${score[s.id]} / ${s.q.length}`),'','Your turn:',$('#txt').value.trim()||'(empty)'];
+  try{await navigator.clipboard.writeText(lines.join('\n'));$('#msg').textContent='Copied! Paste it in Google Classroom for Teacher Jamila.'}
+  catch(err){$('#msg').textContent='Copy did not work here — take a screenshot of your score instead.'}
+};
+try{const v=localStorage.getItem('w8a-name');if(v)$('#nm').value=v;$('#nm').addEventListener('input',e=>{try{localStorage.setItem('w8a-name',e.target.value)}catch(x){}})}catch(x){}
+}
+</script>
+</body>
+</html>
